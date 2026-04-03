@@ -12,6 +12,8 @@ Changelog for 0.0.64:
 * Fixed TotalConsumption Eve characteristic (UInt16 → FLOAT) for correct energy readings
 * Fixed welcome wizard reopening after completion
 * Fixed empty API response parsing error
+* Optional basic auth for XML-RPC connections in remote mode (`-U`/`-P` CLI options)
+* Config server bind address adapts to local vs remote mode
 * Improved error handling for RPC init and translation file loading
 
 Changelog for 0.0.63:

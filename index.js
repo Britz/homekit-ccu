@@ -44,6 +44,8 @@ var dryRun
 var logPath
 var resetSettings = false
 var ccuHost = '127.0.0.1'
+var rpcUser
+var rpcPass
 
 program.option('-D, --debug', 'turn on debug level logging', () => {
   log.setDebugEnabled(true)
@@ -72,6 +74,14 @@ program.option('-L, --log [path]', 'set the path where the log will be created',
 
 program.option('-H, --host [ccuhost]', 'set the host ip for your ccu', (ccuhost) => {
   ccuHost = ccuhost
+})
+
+program.option('-U, --user [rpcuser]', 'set the username for XML-RPC basic auth (remote mode)', (user) => {
+  rpcUser = user
+})
+
+program.option('-P, --password [rpcpassword]', 'set the password for XML-RPC basic auth (remote mode)', (password) => {
+  rpcPass = password
 })
 
   .parse(process.argv)
@@ -136,7 +146,7 @@ if (simulation !== undefined) {
   server.simulate(simPath)
 } else {
   log.debug('Initializing Server')
-  server = new Server(log, configurationPath, ccuHost)
+  server = new Server(log, configurationPath, ccuHost, rpcUser, rpcPass)
   if (resetSettings === true) {
     log.info('---- reset all settings ----')
     server.reset()
