@@ -76,13 +76,32 @@ case "$1" in
     rm /usr/local/etc/config/rc.d/hap-homematic 
 	rm -R /usr/local/etc/config/addons/www/hap-homematic
 	rm -R /usr/local/etc/config/addons/hap-homematic
+	rm -f /etc/config/lighttpd/hap-homematic.conf
+	killall -HUP lighttpd 2>/dev/null
+
+	# remove firewall ports via TCL library
+	if [ -f /lib/libfirewall.tcl ]; then
+	  tclsh - <<'FWEOF'
+source /lib/libfirewall.tcl
+Firewall_loadConfiguration
+global Firewall_USER_PORTS
+foreach port {9874 49874} {
+  set idx [lsearch $Firewall_USER_PORTS $port]
+  if {$idx != -1} {
+    set Firewall_USER_PORTS [lreplace $Firewall_USER_PORTS $idx $idx]
+  }
+}
+Firewall_saveConfiguration
+Firewall_configureFirewall
+FWEOF
+	fi
 
 	# remove the monit settings if there are leftovers
 	if [ -f /usr/local/etc/monit_hap-homematic.cfg ]; then
 	  rm /usr/local/etc/monit_hap-homematic.cfg
 	  # and reload the monit
 	  /usr/bin/monit reload
-	fi 
+	fi
 
 	;;
 
