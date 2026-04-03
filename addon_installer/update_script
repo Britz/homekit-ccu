@@ -17,6 +17,12 @@ if [ $? -eq 1 ]; then
   mount /usr/local
 fi
 
+# ensure a compatible Node.js version is available
+cp -af hap/etc/preinstall.sh /tmp/preinstall.sh
+chmod +x /tmp/preinstall.sh
+/tmp/preinstall.sh
+rm -f /tmp/preinstall.sh
+
 # create necessary directories
 mkdir -p ${ADDON_DIR}
 chmod 755 ${ADDON_DIR}
@@ -38,6 +44,8 @@ cp -af rc.d/* ${RCD_DIR}
 # copy installer
 cp -af hap/etc/postinstall.sh ${ADDONCFG_DIR}/etc
 chmod +x ${ADDONCFG_DIR}/etc/postinstall.sh
+cp -af hap/etc/preinstall.sh ${ADDONCFG_DIR}/etc
+chmod +x ${ADDONCFG_DIR}/etc/preinstall.sh
 
 #build system launcher
 chmod +x ${RCD_DIR}/${ADDONNAME}

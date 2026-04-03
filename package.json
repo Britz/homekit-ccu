@@ -13,7 +13,7 @@
 		"CCU"
 	],
 	"engines": {
-		"node": ">=8.11.0"
+		"node": ">=20.0.0"
 	},
 	"dependencies": {
 		"binrpc": "3.3.1",
@@ -23,8 +23,8 @@
 		"formidable": "^1.2.2",
 		"hap-nodejs": "0.11.1",
 		"homematic-xmlrpc": "1.0.2",
-		"sockjs": "^0.3.20",
-		"moment": "2.29.4"
+		"moment": "2.29.4",
+		"sockjs": "^0.3.20"
 	},
 	"husky": {
 		"hooks": {
@@ -45,10 +45,13 @@
 		"version": "",
 		"postversion": "git push && git push --tags"
 	},
+	"overrides": {
+		"serialize-javascript": "7.0.5"
+	},
 	"devDependencies": {
-		"mocha": "^7.0.1",
 		"expect.js": "0.3.1",
-		"husky": "^4.2.5"
+		"husky": "^4.2.5",
+		"mocha": "^11.3.0"
 	},
 	"mocha": {
 		"bail": true,

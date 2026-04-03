@@ -12,6 +12,10 @@ EXECARGS=$HAPDIR/index.js
 
 do_start()
 {
+	# ensure compatible Node.js is available
+	if [ -e $ADDONCFG_DIR/etc/preinstall.sh ];then
+	  $ADDONCFG_DIR/etc/preinstall.sh
+	fi
 	# run installer if needed
   	if [ -e $ADDONCFG_DIR/etc/postinstall.sh ];then
 	  $ADDONCFG_DIR/etc/postinstall.sh
