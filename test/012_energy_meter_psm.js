@@ -144,7 +144,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     let service = accessory.getService(Service.Outlet)
     let ch = service.getCharacteristic(accessory.eve.Characteristic.TotalConsumption)
     try {
-      expect(ch.value).to.be((rndF / 1000).toFixed(2)) // ccu uses Wh HomeKit kWh and the service rounds
+      expect(ch.value).to.be(parseFloat((rndF / 1000).toFixed(2))) // ccu uses Wh HomeKit kWh and the service rounds
       done()
     } catch (e) {
       done(e)

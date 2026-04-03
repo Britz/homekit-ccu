@@ -113,7 +113,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check SUNSHINEDURATION 340 min which are 5.6 hours', (done) => {
+  it('HAP-Homematic check SUNSHINEDURATION 340 min which are 5.7 hours', (done) => {
     that.server._ccu.setVariable('svHmIPSunshineCounterToday_1002', 340.0)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(accessory.eveWeatherProg.Service.EveWeather)
@@ -122,7 +122,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     assert.ok(ch, 'SunShineDuration State Characteristics not found')
     ch.getValue((context, value) => {
       try {
-        expect(value).to.be(5.6)
+        expect(value).to.be(5.7)
         done()
       } catch (e) {
         done(e)
