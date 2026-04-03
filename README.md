@@ -10,11 +10,13 @@
 </p>
 
 
-a Raspberrymatic / CCU3 addon
+a RaspberryMatic / OpenCCU / CCU3 addon
 
 
-This RaspberryMatic / CCU3 addon will allow you to access your HomeMatic devices from HomeKit. Its much like https://github.com/thkl/homebridge-homematic but without homebridge.
-All this runs on your RaspberryMatic / CCU3. You will not need any extra hardware.
+This RaspberryMatic / OpenCCU / CCU3 addon will allow you to access your HomeMatic devices from HomeKit. Its much like https://github.com/thkl/homebridge-homematic but without homebridge.
+All this runs on your RaspberryMatic / OpenCCU / CCU3. You will not need any extra hardware.
+
+Requires Node.js >= 20. OpenCCU and RaspberryMatic ship Node.js as part of the system image. If Node.js is missing or too old, the addon will automatically download and install a compatible version during installation.
 
 # Installation
 Download the latest addon (hap-homematic-x.x.xx.tar.gz) from https://github.com/thkl/hap-homematic/releases/latest/ and install it via system preferences to your ccu.
@@ -24,19 +26,19 @@ A little bit later (the addon will install all other needed software) you will h
 This will not run on a older CCU2 model.
 
 Used Ports : 
-* 9874 -> Config WebUI
+* 9874 -> Config WebUI (proxied through lighttpd)
+* 49874 -> Config WebUI HTTPS (proxied through lighttpd)
 * 9875 -> RPC event server
 * 9876 -> RPC event server CuxD (optional)
 * 9877..n HAP Instance 0 .. n
 
-make sure your ccu firewall does not block ports 9874,9877 ... n
+Ports 9874 and 49874 are automatically opened in the CCU firewall during addon installation.
 
 Stefan, of verdrahtet.info, has made a nice german tutorial [here](https://www.verdrahtet.info/2020/05/02/homekit-und-homematic-einfach-wie-nie/)
 
 
 # HTTPS
-If you are using the https version of your ccu WebUI page, you have to enable https for the hap-homematic configuration page also.
-hap-homematic will use the same self signed tls certificate as your ccu.
+If you are using the https version of your ccu WebUI page, the configuration page is automatically available on port 49874 via the lighttpd HTTPS proxy. hap-homematic will use the same self signed tls certificate as your ccu.
 
 # Authentication
 You can use your ccu user management as an optional authentication for hap-homematic. If you turn on this feature, you have to call the configuration page from your ccu webUI system preference page to use a valid session. Only ccu admins are alowed to use the hap-homematic configuration page if authentication was turned on.

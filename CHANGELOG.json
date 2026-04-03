@@ -1,5 +1,22 @@
 {
     "versions": {
+        "0.0.64": {
+            "descriptions": [
+                "OpenCCU compatibility",
+                "Config UI proxied through lighttpd (ports 9874 HTTP, 49874 HTTPS)",
+                "Addon firewall ports (9874, 49874) automatically opened/closed on install/uninstall",
+                "Dynamic XML-RPC port remapping for OpenCCU internal daemon ports",
+                "Node.js preinstall check — automatically downloads Node.js 20 if missing or too old",
+                "Minimum Node.js version bumped to >= 20",
+                "Removed vulnerable ip package (CVE-2024-29415), replaced with built-in Node.js modules",
+                "Fixed serialize-javascript prototype pollution vulnerability via dependency override",
+                "Fixed TotalConsumption Eve characteristic (UInt16 to FLOAT) for correct energy readings",
+                "Fixed welcome wizard reopening after completion",
+                "Fixed empty API response parsing error",
+                "Improved error handling for RPC init and translation file loading"
+            ],
+            "issues": []
+        },
         "0.0.63": {
             "descriptions": [
                 "Just one BugFix (in some cases the ui will not get devices from core)"
@@ -23,5 +40,5 @@
             "issues": []
         }
     },
-    "latest": "0.0.63"
+    "latest": "0.0.64"
 }

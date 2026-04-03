@@ -1,3 +1,19 @@
+Changelog for 0.0.64:
+====================
+
+* OpenCCU compatibility
+* Config UI is now proxied through lighttpd (ports 9874 HTTP, 49874 HTTPS) — fixes firewall and iframe issues on OpenCCU
+* Addon firewall ports (9874, 49874) are automatically opened/closed on install/uninstall
+* Dynamic XML-RPC port remapping for OpenCCU internal daemon ports (32001/32010/39292 → 2001/2010/9292)
+* Node.js preinstall check — automatically downloads Node.js 20 if missing or too old
+* Minimum Node.js version bumped to >= 20
+* Removed vulnerable `ip` npm package (CVE-2024-29415), replaced with built-in Node.js modules
+* Fixed `serialize-javascript` prototype pollution vulnerability via dependency override
+* Fixed TotalConsumption Eve characteristic (UInt16 → FLOAT) for correct energy readings
+* Fixed welcome wizard reopening after completion
+* Fixed empty API response parsing error
+* Improved error handling for RPC init and translation file loading
+
 Changelog for 0.0.63:
 ====================
 
