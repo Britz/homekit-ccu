@@ -1,0 +1,26 @@
+{
+  "name": "hap-homematic on OpenCCU",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "ccu",
+  "workspaceFolder": "/workspace",
+  "overrideCommand": false,
+  "shutdownAction": "stopCompose",
+  "postCreateCommand": "cd /workspace && npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "Anthropic.claude-code"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "dev.containers.dockerPath": "podman",
+        "dev.containers.dockerComposePath": "podman compose"
+      }
+    }
+  },
+  "forwardPorts": [8080, 9874, 9875, 9877, 9878, 9879, 49874],
+  "remoteEnv": {
+    "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}"
+  }
+}
