@@ -12,7 +12,7 @@ log.setDebugEnabled(false)
 
 const testCase = 'HmIP-SMI.json'
 
-describe('HAP-Homematic Tests ' + testCase, () => {
+describe('HomeKit-CCU Tests ' + testCase, () => {
   let that = this
 
   before(async () => {
@@ -45,22 +45,22 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check test mode', (done) => {
+  it('HomeKit-CCU check test mode', (done) => {
     expect(that.server.isTestMode).to.be(true)
     done()
   })
 
-  it('HAP-Homematic check number of ccu devices', (done) => {
+  it('HomeKit-CCU check number of ccu devices', (done) => {
     expect(that.server._ccu.getCCUDevices().length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check number of mappend devices', (done) => {
+  it('HomeKit-CCU check number of mappend devices', (done) => {
     expect(Object.keys(that.server._publishedAccessories).length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check assigned services', (done) => {
+  it('HomeKit-CCU check assigned services', (done) => {
     Object.keys(that.server._publishedAccessories).map(key => {
       let accessory = that.server._publishedAccessories[key]
       expect(accessory.serviceClass).to.be(that.data.ccu[accessory.address()])
@@ -68,7 +68,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     done()
   })
 
-  it('HAP-Homematic check MOTION false', (done) => {
+  it('HomeKit-CCU check MOTION false', (done) => {
     that.server._ccu.fireEvent('HmIP.0123456789ABCD:1.MOTION', false)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.MotionSensor, 'TestDevice', false, '', true)
@@ -85,7 +85,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check MOTION true', (done) => {
+  it('HomeKit-CCU check MOTION true', (done) => {
     that.server._ccu.fireEvent('HmIP.0123456789ABCD:1.MOTION', true)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.MotionSensor)
@@ -102,7 +102,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
 
   let rnd = Math.floor(Math.random() * Math.floor(500)) + 1 // add 1 to be > 0.0001 which is the min level
 
-  it('HAP-Homematic check ILLUMINATION', (done) => {
+  it('HomeKit-CCU check ILLUMINATION', (done) => {
     that.server._ccu.fireEvent('HmIP.0123456789ABCD:1.ILLUMINATION', rnd)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.LightSensor)

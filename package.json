@@ -1,11 +1,11 @@
 {
-	"name": "hap-homematic",
-	"version": "0.0.63",
+	"name": "homekit-ccu",
+	"version": "0.0.15",
 	"description": "provides a homekit bridge to the ccu",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/thkl/hap-homematic.git"
+		"url": "git://github.com/britz/homekit-ccu.git"
 	},
 	"keywords": [
 		"HomeKit",
@@ -37,8 +37,8 @@
 		"dev": "node index.js -D || true",
 		"devall": "DEBUG=* node index.js -D || true",
 		"test": "mocha",
-		"update": "mkdir /tmp/hap-homematic-cache;cd /usr/local/addons/hap-homematic;npm i --cache /tmp/hap-homematic-cache hap-homematic@latest;rm -R /tmp/hap-homematic-cache",
-		"restart": "/etc/config/rc.d/hap-homematic restart",
+		"update": "mkdir /tmp/homekit-ccu-cache;cd /usr/local/addons/homekit-ccu;npm i --cache /tmp/homekit-ccu-cache homekit-ccu@latest;rm -R /tmp/homekit-ccu-cache",
+		"restart": "/etc/config/rc.d/homekit-ccu restart",
 		"lint": "standard",
 		"preversion": "npm run test",
 		"prebuild": "npm --no-git-tag-version version patch",

@@ -2,22 +2,22 @@
 
 curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 sudo apt install -y nodejs
-mkdir $HOME/hap-homematic
-mkdir $HOME/.hap-homematic
-cd $HOME/hap-homematic
-npm install hap-homematic
-rm $HOME/hap-homematic/hap-homematic.service
-if test -f "$HOME/hap-homematic/hap-homematic.service"; then
-    rm $HOME/hap-homematic/hap-homematic.service
+mkdir $HOME/homekit-ccu
+mkdir $HOME/.homekit-ccu
+cd $HOME/homekit-ccu
+npm install homekit-ccu
+rm $HOME/homekit-ccu/homekit-ccu.service
+if test -f "$HOME/homekit-ccu/homekit-ccu.service"; then
+    rm $HOME/homekit-ccu/homekit-ccu.service
 fi
-bash -c 'cat << EOT >> $HOME/hap-homematic/hap-homematic.service
+bash -c 'cat << EOT >> $HOME/homekit-ccu/homekit-ccu.service
 [Unit]
-Description=Hap_Homematic
+Description=HomeKit_CCU
 After=debmatic-rega.target
 [Service]
 Type=simple
 User=root
-ExecStart=/usr/bin/node $HOME/hap-homematic/node_modules/hap-homematic/index -C $HOME/.hap-homematic/
+ExecStart=/usr/bin/node $HOME/homekit-ccu/node_modules/homekit-ccu/index -C $HOME/.homekit-ccu/
 Restart=on-failure
 RestartSec=10
 KillMode=process
@@ -25,7 +25,7 @@ KillMode=process
 WantedBy=multi-user.target
 EOT'
 
-chmod +x $HOME/hap-homematic/hap-homematic.service
-sudo systemctl link $HOME/hap-homematic/hap-homematic.service
-sudo systemctl enable hap-homematic.service
-sudo service hap-homematic start
+chmod +x $HOME/homekit-ccu/homekit-ccu.service
+sudo systemctl link $HOME/homekit-ccu/homekit-ccu.service
+sudo systemctl enable homekit-ccu.service
+sudo service homekit-ccu start

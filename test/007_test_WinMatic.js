@@ -12,7 +12,7 @@ log.setDebugEnabled(false)
 
 const testCase = 'HM-Sec-Win.json'
 
-describe('HAP-Homematic Tests ' + testCase, () => {
+describe('HomeKit-CCU Tests ' + testCase, () => {
   let that = this
 
   before(async () => {
@@ -40,22 +40,22 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check test mode', (done) => {
+  it('HomeKit-CCU check test mode', (done) => {
     expect(that.server.isTestMode).to.be(true)
     done()
   })
 
-  it('HAP-Homematic check number of ccu devices', (done) => {
+  it('HomeKit-CCU check number of ccu devices', (done) => {
     expect(that.server._ccu.getCCUDevices().length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check number of mappend devices', (done) => {
+  it('HomeKit-CCU check number of mappend devices', (done) => {
     expect(Object.keys(that.server._publishedAccessories).length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check assigned services', (done) => {
+  it('HomeKit-CCU check assigned services', (done) => {
     Object.keys(that.server._publishedAccessories).map(key => {
       let accessory = that.server._publishedAccessories[key]
       expect(accessory.serviceClass).to.be(that.data.ccu[accessory.address()])
@@ -63,7 +63,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     done()
   })
 
-  it('HAP-Homematic check LEVEL 0 Cur Tar Pos sould be 0', (done) => {
+  it('HomeKit-CCU check LEVEL 0 Cur Tar Pos sould be 0', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.LEVEL', 0)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.Window, 'TestDevice', false, '', true)
@@ -89,7 +89,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check running window - fire level 50%', (done) => {
+  it('HomeKit-CCU check running window - fire level 50%', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.WORKING', true)
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.LEVEL', 0.5)
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.DIRECTION', 1)
@@ -112,7 +112,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     }
   })
 
-  it('HAP-Homematic check running window done (100%) Working still not false', (done) => {
+  it('HomeKit-CCU check running window done (100%) Working still not false', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.WORKING', true)
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.LEVEL', 1)
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.DIRECTION', 1)
@@ -158,7 +158,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check running window done with working false', (done) => {
+  it('HomeKit-CCU check running window done with working false', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.LEVEL', 1)
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.DIRECTION', 1)
     that.server._ccu.fireEvent('BidCos-RF.1123456789ABCD:1.WORKING', false)

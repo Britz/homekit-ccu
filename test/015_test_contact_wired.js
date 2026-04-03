@@ -12,7 +12,7 @@ log.setDebugEnabled(false)
 
 const testCase = 'HMW-Sen-SC-12-DR.json'
 
-describe('HAP-Homematic Tests ' + testCase, () => {
+describe('HomeKit-CCU Tests ' + testCase, () => {
   let that = this
 
   before(async () => {
@@ -45,22 +45,22 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check test mode', (done) => {
+  it('HomeKit-CCU check test mode', (done) => {
     expect(that.server.isTestMode).to.be(true)
     done()
   })
 
-  it('HAP-Homematic check number of ccu devices', (done) => {
+  it('HomeKit-CCU check number of ccu devices', (done) => {
     expect(that.server._ccu.getCCUDevices().length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check number of mappend devices', (done) => {
+  it('HomeKit-CCU check number of mappend devices', (done) => {
     expect(Object.keys(that.server._publishedAccessories).length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check assigned services', (done) => {
+  it('HomeKit-CCU check assigned services', (done) => {
     Object.keys(that.server._publishedAccessories).map(key => {
       let accessory = that.server._publishedAccessories[key]
       expect(accessory.serviceClass).to.be(that.data.ccu[accessory.address()])
@@ -68,7 +68,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     done()
   })
 
-  it('HAP-Homematic check SENSOR 0', (done) => {
+  it('HomeKit-CCU check SENSOR 0', (done) => {
     that.server._ccu.fireEvent('BidCos-Wired.7348266248ABCD:1.SENSOR', false)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.ContactSensor, 'TestDevice', false, '', true)
@@ -85,7 +85,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check SENSOR 1', (done) => {
+  it('HomeKit-CCU check SENSOR 1', (done) => {
     that.server._ccu.fireEvent('BidCos-Wired.7348266248ABCD:1.SENSOR', true)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.ContactSensor)
@@ -100,7 +100,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check SENSOR back to 0', (done) => {
+  it('HomeKit-CCU check SENSOR back to 0', (done) => {
     that.server._ccu.fireEvent('BidCos-Wired.7348266248ABCD:1.SENSOR', false)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.ContactSensor)

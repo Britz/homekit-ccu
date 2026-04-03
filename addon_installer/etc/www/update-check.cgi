@@ -1,7 +1,7 @@
 #!/bin/tclsh
 
-set version_url "https://raw.githubusercontent.com/thkl/hap-homematic/master/addon_installer/VERSION"
-set package_url "https://github.com/thkl/hap-homematic/releases/latest"
+set version_url "https://raw.githubusercontent.com/britz/hap-homematic/master/addon_installer/VERSION"
+set package_url "https://github.com/britz/hap-homematic/releases/latest"
 
 catch {
   set input $env(QUERY_STRING)

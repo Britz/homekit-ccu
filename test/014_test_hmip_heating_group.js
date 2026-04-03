@@ -12,7 +12,7 @@ log.setDebugEnabled(false)
 
 const testCase = 'HmIP-Heating.json'
 
-describe('HAP-Homematic Tests (IP Heating Groups) ' + testCase, () => {
+describe('HomeKit-CCU Tests (IP Heating Groups) ' + testCase, () => {
   let that = this
 
   before(async () => {
@@ -44,22 +44,22 @@ describe('HAP-Homematic Tests (IP Heating Groups) ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check test mode', (done) => {
+  it('HomeKit-CCU check test mode', (done) => {
     expect(that.server.isTestMode).to.be(true)
     done()
   })
 
-  it('HAP-Homematic check number of ccu devices', (done) => {
+  it('HomeKit-CCU check number of ccu devices', (done) => {
     expect(that.server._ccu.getCCUDevices().length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check number of mappend devices', (done) => {
+  it('HomeKit-CCU check number of mappend devices', (done) => {
     expect(Object.keys(that.server._publishedAccessories).length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check assigned services', (done) => {
+  it('HomeKit-CCU check assigned services', (done) => {
     Object.keys(that.server._publishedAccessories).map(key => {
       let accessory = that.server._publishedAccessories[key]
       expect(accessory.serviceClass).to.be(that.data.ccu[accessory.address()])
@@ -67,7 +67,7 @@ describe('HAP-Homematic Tests (IP Heating Groups) ' + testCase, () => {
     done()
   })
 
-  it('HAP-Homematic check ACTUAL_TEMPERATURE with random value', (done) => {
+  it('HomeKit-CCU check ACTUAL_TEMPERATURE with random value', (done) => {
     let rnd = Math.floor(Math.random() * Math.floor(30))
     that.server._ccu.fireEvent('HmIP.4762653007ABCD:1.ACTUAL_TEMPERATURE', rnd)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
@@ -85,7 +85,7 @@ describe('HAP-Homematic Tests (IP Heating Groups) ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check HUMIDITY with random value', (done) => {
+  it('HomeKit-CCU check HUMIDITY with random value', (done) => {
     let rnd = Math.floor(Math.random() * Math.floor(100))
     that.server._ccu.fireEvent('HmIP.4762653007ABCD:1.HUMIDITY', rnd)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
@@ -101,7 +101,7 @@ describe('HAP-Homematic Tests (IP Heating Groups) ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check SET_TEMPERATURE and HeatingMode', (done) => {
+  it('HomeKit-CCU check SET_TEMPERATURE and HeatingMode', (done) => {
     let rnd1 = Math.floor(Math.random() * Math.floor(30)) + 5 // make sure we do not set below the off themp
     that.server._ccu.fireEvent('HmIP.4762653007ABCD:1.SET_POINT_MODE', 1) // Set Control Mode
     that.server._ccu.fireEvent('HmIP.4762653007ABCD:1.ACTUAL_TEMPERATURE', (rnd1 - 5)) // Set Temperature
@@ -129,7 +129,7 @@ describe('HAP-Homematic Tests (IP Heating Groups) ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check Heating Mode Off', (done) => {
+  it('HomeKit-CCU check Heating Mode Off', (done) => {
     that.server._ccu.fireEvent('HmIP.4762653007ABCD:1.SET_POINT_TEMPERATURE', 4.5)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.Thermostat)

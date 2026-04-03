@@ -12,7 +12,7 @@ log.setDebugEnabled(false)
 
 const testCase = 'HmIP-eTRV-2.json'
 
-describe('HAP-Homematic Tests ' + testCase, () => {
+describe('HomeKit-CCU Tests ' + testCase, () => {
   let that = this
 
   before(async () => {
@@ -45,22 +45,22 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check test mode', (done) => {
+  it('HomeKit-CCU check test mode', (done) => {
     expect(that.server.isTestMode).to.be(true)
     done()
   })
 
-  it('HAP-Homematic check number of ccu devices', (done) => {
+  it('HomeKit-CCU check number of ccu devices', (done) => {
     expect(that.server._ccu.getCCUDevices().length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check number of mappend devices', (done) => {
+  it('HomeKit-CCU check number of mappend devices', (done) => {
     expect(Object.keys(that.server._publishedAccessories).length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check assigned services', (done) => {
+  it('HomeKit-CCU check assigned services', (done) => {
     Object.keys(that.server._publishedAccessories).map(key => {
       let accessory = that.server._publishedAccessories[key]
       expect(accessory.serviceClass).to.be(that.data.ccu[accessory.address()])
@@ -68,7 +68,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     done()
   })
 
-  it('HAP-Homematic check ACTUAL_TEMPERATURE', (done) => {
+  it('HomeKit-CCU check ACTUAL_TEMPERATURE', (done) => {
     // first close the windows so the heating will operate
     that.server._ccu.fireEvent('HmIP.2123456789ABCD:1.WINDOW_STATE', 0)
 
@@ -89,7 +89,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check SET_POINT_TEMPERATURE and HeatingMode', (done) => {
+  it('HomeKit-CCU check SET_POINT_TEMPERATURE and HeatingMode', (done) => {
     that.server._ccu.fireEvent('HmIP.2123456789ABCD:1.SET_POINT_MODE', 1) // Set Control Mode
     that.server._ccu.fireEvent('HmIP.2123456789ABCD:1.ACTUAL_TEMPERATURE', 20) // Set Temperature
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
@@ -115,7 +115,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check SET_POINT_TEMPERATURE and HeatingMode Off by Target Temp (20) below Current Temp (24)', (done) => {
+  it('HomeKit-CCU check SET_POINT_TEMPERATURE and HeatingMode Off by Target Temp (20) below Current Temp (24)', (done) => {
     that.server._ccu.fireEvent('HmIP.2123456789ABCD:1.SET_POINT_MODE', 1) // Set Control Mode
     that.server._ccu.fireEvent('HmIP.2123456789ABCD:1.ACTUAL_TEMPERATURE', 24) // Set Temperature
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
@@ -141,7 +141,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check Heating Mode Off', (done) => {
+  it('HomeKit-CCU check Heating Mode Off', (done) => {
     that.server._ccu.fireEvent('HmIP.2123456789ABCD:1.SET_POINT_TEMPERATURE', 4.5)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.Thermostat)
@@ -208,7 +208,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check HUMIDITY is not here', (done) => {
+  it('HomeKit-CCU check HUMIDITY is not here', (done) => {
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.Thermostat)
     assert.ok(service, 'Thermostat Service not found')

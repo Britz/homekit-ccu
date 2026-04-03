@@ -12,7 +12,7 @@ log.setDebugEnabled(false)
 
 const testCase = 'HmIP-DLD.json'
 
-describe('HAP-Homematic Tests ' + testCase, () => {
+describe('HomeKit-CCU Tests ' + testCase, () => {
   let that = this
 
   before(async () => {
@@ -42,22 +42,22 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check test mode', (done) => {
+  it('HomeKit-CCU check test mode', (done) => {
     expect(that.server.isTestMode).to.be(true)
     done()
   })
 
-  it('HAP-Homematic check number of ccu devices', (done) => {
+  it('HomeKit-CCU check number of ccu devices', (done) => {
     expect(that.server._ccu.getCCUDevices().length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check number of mappend devices', (done) => {
+  it('HomeKit-CCU check number of mappend devices', (done) => {
     expect(Object.keys(that.server._publishedAccessories).length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check assigned services', (done) => {
+  it('HomeKit-CCU check assigned services', (done) => {
     Object.keys(that.server._publishedAccessories).map(key => {
       let accessory = that.server._publishedAccessories[key]
       expect(accessory.serviceClass).to.be(that.data.ccu[accessory.address()])
@@ -65,7 +65,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     done()
   })
 
-  it('HAP-Homematic check LOCK_STATE 0 Cur sould be UNSECURED', (done) => {
+  it('HomeKit-CCU check LOCK_STATE 0 Cur sould be UNSECURED', (done) => {
     that.server._ccu.fireEvent('HmIP.7316163726ABCD:1.LOCK_STATE', 0)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.LockMechanism, 'TestDevice', false, '', true)
@@ -82,7 +82,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check LOCK_STATE 1 Cur sould be LOCKED', (done) => {
+  it('HomeKit-CCU check LOCK_STATE 1 Cur sould be LOCKED', (done) => {
     that.server._ccu.fireEvent('HmIP.7316163726ABCD:1.LOCK_STATE', 1)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.LockMechanism, 'TestDevice', false, '', true)
@@ -99,7 +99,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check LOCK_STATE 2 Cur sould be UNSECURED', (done) => {
+  it('HomeKit-CCU check LOCK_STATE 2 Cur sould be UNSECURED', (done) => {
     that.server._ccu.fireEvent('HmIP.7316163726ABCD:1.LOCK_STATE', 0)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.LockMechanism, 'TestDevice', false, '', true)

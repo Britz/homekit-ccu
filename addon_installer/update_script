@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ADDONNAME=hap-homematic
+ADDONNAME=homekit-ccu
 CONFIG_DIR=/usr/local/etc/config
 ADDON_DIR=/usr/local/addons/${ADDONNAME}
 ADDONWWW_DIR=/usr/local/etc/config/addons/www
@@ -35,15 +35,15 @@ mkdir -p ${CONFIG_DIR}/${ADDONNAME}
 
 #create the www stuff - copy config UI static files so lighttpd serves them directly
 mkdir -p ${ADDONWWW_DIR}/${ADDONNAME}
-HAPDIR=${ADDON_DIR}/node_modules/hap-homematic
+HAPDIR=${ADDON_DIR}/node_modules/homekit-ccu
 cp -af ${HAPDIR}/lib/configurationsrv/html/* ${ADDONWWW_DIR}/${ADDONNAME}
 cp -af hap/etc/www/update-check.cgi ${ADDONWWW_DIR}/${ADDONNAME}
-cp -af hap/etc/www/hap-homematic-logo.png ${ADDONWWW_DIR}/${ADDONNAME}
+cp -af hap/etc/www/homekit-ccu-logo.png ${ADDONWWW_DIR}/${ADDONNAME}
 
 # install lighttpd proxy config (proxies external ports to config server)
-HAPDIR=${ADDON_DIR}/node_modules/hap-homematic
+HAPDIR=${ADDON_DIR}/node_modules/homekit-ccu
 mkdir -p /etc/config/lighttpd
-cp -af ${HAPDIR}/etc/hap-homematic.conf /etc/config/lighttpd/${ADDONNAME}.conf
+cp -af ${HAPDIR}/etc/homekit-ccu.conf /etc/config/lighttpd/${ADDONNAME}.conf
 
 # open proxy ports in firewall via TCL library (persists through WebUI saves)
 if [ -f /lib/libfirewall.tcl ]; then
@@ -76,7 +76,7 @@ chmod +x ${ADDONWWW_DIR}/${ADDONNAME}/update-check.cgi
 sync
 
 #check if the plugin is allready installd
-if [ ! -f ${ADDON_DIR}/node_modules/hap-homematic/index.js ]; then
+if [ ! -f ${ADDON_DIR}/node_modules/homekit-ccu/index.js ]; then
 # new installation so reboot and the launcher will install the rest of the system
   exit 10
 else

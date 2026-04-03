@@ -2,7 +2,7 @@ const assert = require('assert')
 const path = require('path')
 const fs = require('fs')
 
-describe('HAP-Homematic Localization Tests', () => {
+describe('HomeKit-CCU Localization Tests', () => {
   this.regEx = /.__\('([^,][^']*)/g
   this.regExIndex = /data-localize="(.*)"/g
 
@@ -13,7 +13,7 @@ describe('HAP-Homematic Localization Tests', () => {
     console.log(`Using Localization from ${locFile}`);
   }
 
-  it('HAP-Homematic check all service files ', (done) => {
+  it('HomeKit-CCU check all service files ', (done) => {
     // load the file
 
     let items = fs.readdirSync(path.join(__dirname, '..', 'lib', 'services'))

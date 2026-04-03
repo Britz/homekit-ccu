@@ -10,7 +10,7 @@ assignees: ''
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 
-Note: If you just have a question or want to know something consider to open a thread in [Discussions](https://github.com/thkl/hap-homematic/discussions/new)
+Note: If you just have a question or want to know something consider to open a thread in [Discussions](https://github.com/britz/homekit-ccu/discussions/new)
 
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.
@@ -22,4 +22,4 @@ A clear and concise description of any alternative solutions or features you've 
 Add any other context or screenshots about the feature request here.
 
 **Device related data**
-If you want to add a new device or add a feature to a new device, please login to your hap-homematic WebUI; Select Internal/Help and create the device description file as described in the dialog you will get. Please attach the file to your request.
+If you want to add a new device or add a feature to a new device, please login to your homekit-ccu WebUI; Select Internal/Help and create the device description file as described in the dialog you will get. Please attach the file to your request.

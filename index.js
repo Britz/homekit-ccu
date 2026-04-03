@@ -1,6 +1,6 @@
 /*
  * File: index.js
- * Project: hap-homematic
+ * Project: homekit-ccu
  * File Created: Saturday, 7th March 2020 12:13:17 pm
  * Author: Thomas Kluge (th.kluge@me.com)
  * -----
@@ -35,7 +35,7 @@ const program = require('commander')
 const os = require('os')
 const fs = require('fs')
 
-process.name = 'hap-homematic'
+process.name = 'homekit-ccu'
 
 let log = new Logger('HAP Server')
 var configurationPath = path.join('/usr/local/etc/config/addons/', process.name)
@@ -102,25 +102,25 @@ process.on('uncaughtException', (err) => {
 
 try {
   if ((logPath !== undefined) && (fs.existsSync(logPath)) && (fs.accessSync(logPath, fs.constants.W_OK))) {
-    log.info("Log into %s /hap-homematic.log", logPath);
-    log.setLogFile(path.join(logPath, 'hap-homematic.log'))
+    log.info("Log into %s /homekit-ccu.log", logPath);
+    log.setLogFile(path.join(logPath, 'homekit-ccu.log'))
   } else
 
     if (fs.existsSync('/var/log') && (fs.accessSync('/var/log', fs.constants.W_OK))) {
-      log.info("Log into /var/log/hap-homematic.log");
-      log.setLogFile(path.join('/var/log', 'hap-homematic.log'))
+      log.info("Log into /var/log/homekit-ccu.log");
+      log.setLogFile(path.join('/var/log', 'homekit-ccu.log'))
     } else {
       let tmpDir = fs.realpathSync(os.tmpdir())
-      log.info("Log into %s/hap-homematic.log", tmpDir);
-      log.setLogFile(path.join(tmpDir, 'hap-homematic.log'))
+      log.info("Log into %s/homekit-ccu.log", tmpDir);
+      log.setLogFile(path.join(tmpDir, 'homekit-ccu.log'))
     }
 } catch (e) {
   log.error(e);
   log.warn('cannot set persistent file for logger trying temp');
   try {
     let tmpDir = fs.realpathSync(os.tmpdir())
-    log.info("Log into %s/hap-homematic.log", tmpDir);
-    log.setLogFile(path.join(tmpDir, 'hap-homematic.log'))
+    log.info("Log into %s/homekit-ccu.log", tmpDir);
+    log.setLogFile(path.join(tmpDir, 'homekit-ccu.log'))
   } catch (e) {
     log.error(e);
     log.warn('cannot set persistent file for logger into temp. givin up');
@@ -135,7 +135,7 @@ if (fs.existsSync(fdebug)) {
 
 log.info('---- launching ----')
 log.info('Welcome to HAP Homematic. Use your HomeMatic devices in HomeKit')
-log.info('(c) 2021 by @thkl - https://github.com/thkl/hap-homematic')
+log.info('(c) 2026 by @britz - https://github.com/britz/homekit-ccu')
 log.info('Logging into %s', log.getLogFile())
 var server
 

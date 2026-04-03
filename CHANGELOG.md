@@ -1,3 +1,12 @@
+Changelog for 0.0.15:
+====================
+
+* Renamed project from hap-homematic to homekit-ccu
+* npm package is now bundled in the addon tar — no public registry access required at install time
+* Version is now derived from package.json as the single source of truth (addon_installer/VERSION removed)
+* Node.js version is now shown alongside the addon version in CCU System Control
+* Fixed OpenCCU compatibility issues
+
 Changelog for 0.0.64:
 ====================
 
@@ -254,7 +263,7 @@ Changelog for 0.0.31:
 Changelog for 0.0.30:
 =====================
 
-* hap-homematic will install a config for the raspberrymatic monitoring service (if there is one)
+* homekit-ccu will install a config for the raspberrymatic monitoring service (if there is one)
 * added variable based thermometers
 * new special device which will show the ccu core temperature
 

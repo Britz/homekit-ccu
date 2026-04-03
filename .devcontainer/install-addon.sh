@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install hap-homematic into the running OpenCCU as a proper addon,
+# Install homekit-ccu into the running OpenCCU as a proper addon,
 # mirroring what happens when the .tar.gz is uploaded via the WebUI.
 #
 # Instead of pulling from npm, it symlinks the workspace source so
@@ -7,7 +7,7 @@
 
 set -e
 
-ADDONNAME=hap-homematic
+ADDONNAME=homekit-ccu
 CONFIG_DIR=/usr/local/etc/config
 ADDON_DIR=/usr/local/addons/${ADDONNAME}
 ADDONCFG_DIR=${CONFIG_DIR}/addons/${ADDONNAME}
@@ -16,12 +16,28 @@ RCD_DIR=${CONFIG_DIR}/rc.d
 WORKSPACE=/workspace
 LOGFILE=/var/log/hmhapinstall.log
 
-echo "=== hap-homematic addon installer (dev mode) ==="
+echo "=== homekit-ccu addon installer (dev mode) ==="
 echo ""
 
 # ---- 1. Wait for CCU services ----
 echo "[1/6] Waiting for CCU services..."
-"$(dirname "$0")/wait-for-ccu.sh" || exit 1
+MAX_WAIT=120
+WAITED=0
+INTERVAL=3
+# Wait for ReGaHss (port 8181) — needed for addon registration in step 6
+while [ "$WAITED" -lt "$MAX_WAIT" ]; do
+  if wget -q -O /dev/null --timeout=2 "http://127.0.0.1:8181/tclrega.exe" 2>/dev/null; then
+    echo "  ReGaHss is ready (port 8181)"
+    break
+  fi
+  printf "  Waiting for ReGaHss... (%ds/%ds)\n" "$WAITED" "$MAX_WAIT"
+  sleep "$INTERVAL"
+  WAITED=$((WAITED + INTERVAL))
+done
+if [ "$WAITED" -ge "$MAX_WAIT" ]; then
+  echo "ERROR: ReGaHss did not become ready within ${MAX_WAIT}s" >&2
+  exit 1
+fi
 echo ""
 
 # ---- 2. Create directory structure (same as update_script) ----
@@ -36,8 +52,8 @@ echo "  ${ADDONCFG_DIR}/etc"
 echo "  ${ADDONWWW_DIR}"
 
 # ---- 3. Install via symlink instead of npm ----
-# The real postinstall.sh does: cd $ADDON_DIR && npm i hap-homematic
-# We create the same node_modules/hap-homematic path but as a symlink
+# The real postinstall.sh does: cd $ADDON_DIR && npm i homekit-ccu.tgz
+# We create the same node_modules/homekit-ccu path but as a symlink
 # to /workspace so live edits take effect immediately.
 echo "[3/6] Linking workspace as installed addon..."
 mkdir -p "${ADDON_DIR}/node_modules"
@@ -56,14 +72,14 @@ echo "  -> ${ADDON_DIR}/node_modules/${ADDONNAME} -> ${WORKSPACE}"
 
 # ---- 4. Install web UI files ----
 echo "[4/6] Installing WebUI files..."
-# Copy config UI static files (HTML/JS/CSS) so lighttpd serves them at /addons/hap-homematic/
+# Copy config UI static files (HTML/JS/CSS) so lighttpd serves them at /addons/homekit-ccu/
 cp -rf "${WORKSPACE}/lib/configurationsrv/html/"* "${ADDONWWW_DIR}/"
 cp -f "${WORKSPACE}/addon_installer/etc/www/update-check.cgi" "${ADDONWWW_DIR}/"
-cp -f "${WORKSPACE}/addon_installer/etc/www/hap-homematic-logo.png" "${ADDONWWW_DIR}/"
+cp -f "${WORKSPACE}/addon_installer/etc/www/homekit-ccu-logo.png" "${ADDONWWW_DIR}/"
 chmod +x "${ADDONWWW_DIR}/update-check.cgi"
 # Install lighttpd proxy config (proxies external ports to config server)
 mkdir -p /etc/config/lighttpd
-cp -f "${WORKSPACE}/etc/hap-homematic.conf" "/etc/config/lighttpd/${ADDONNAME}.conf"
+cp -f "${WORKSPACE}/etc/homekit-ccu.conf" "/etc/config/lighttpd/${ADDONNAME}.conf"
 # Open proxy ports in firewall via TCL library (persists through WebUI saves)
 if [ -f /lib/libfirewall.tcl ]; then
   tclsh - <<'FWEOF'

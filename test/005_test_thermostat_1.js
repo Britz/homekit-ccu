@@ -12,7 +12,7 @@ log.setDebugEnabled(true)
 
 const testCase = 'HM-TC-IT-WM-W-EU.json'
 
-describe('HAP-Homematic Tests ' + testCase, () => {
+describe('HomeKit-CCU Tests ' + testCase, () => {
   let that = this
 
   before(async () => {
@@ -45,22 +45,22 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check test mode', (done) => {
+  it('HomeKit-CCU check test mode', (done) => {
     expect(that.server.isTestMode).to.be(true)
     done()
   })
 
-  it('HAP-Homematic check number of ccu devices', (done) => {
+  it('HomeKit-CCU check number of ccu devices', (done) => {
     expect(that.server._ccu.getCCUDevices().length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check number of mappend devices', (done) => {
+  it('HomeKit-CCU check number of mappend devices', (done) => {
     expect(Object.keys(that.server._publishedAccessories).length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check assigned services', (done) => {
+  it('HomeKit-CCU check assigned services', (done) => {
     Object.keys(that.server._publishedAccessories).map(key => {
       let accessory = that.server._publishedAccessories[key]
       expect(accessory.serviceClass).to.be(that.data.ccu[accessory.address()])
@@ -68,7 +68,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     done()
   })
 
-  it('HAP-Homematic check ACTUAL_TEMPERATURE with random value', (done) => {
+  it('HomeKit-CCU check ACTUAL_TEMPERATURE with random value', (done) => {
     let rnd = Math.floor(Math.random() * Math.floor(30))
     that.server._ccu.fireEvent('BidCos-RF.0123456789ABCD:2.ACTUAL_TEMPERATURE', rnd)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
@@ -86,7 +86,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check ACTUAL_HUMIDITY with random value', (done) => {
+  it('HomeKit-CCU check ACTUAL_HUMIDITY with random value', (done) => {
     let rnd = Math.floor(Math.random() * Math.floor(100))
     that.server._ccu.fireEvent('BidCos-RF.0123456789ABCD:2.ACTUAL_HUMIDITY', rnd)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
@@ -102,7 +102,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
   /*
-  it('HAP-Homematic check SET_TEMPERATURE and HeatingMode should be heating', (done) => {
+  it('HomeKit-CCU check SET_TEMPERATURE and HeatingMode should be heating', (done) => {
     let rnd1 = Math.floor(Math.random() * Math.floor(30)) + 5 // make sure we do not set below the off themp
     // We have to set a Current Temperature below the new settemp to make sure the thermostate is in heating mode
     that.server._ccu.fireEvent('BidCos-RF.0123456789ABCD:2.ACTUAL_TEMPERATURE', (rnd1 - 2))
@@ -133,7 +133,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
   })
   */
 
-  it('HAP-Homematic check SET_TEMPERATURE and HeatingMode should be OFF', (done) => {
+  it('HomeKit-CCU check SET_TEMPERATURE and HeatingMode should be OFF', (done) => {
     // Set The controlmode to manual
     that.server._ccu.fireEvent('BidCos-RF.0123456789ABCD:2.CONTROL_MODE', 1)
     // We have to set a Current Temperature below the new settemp to make sure the thermostate is in heating mode
@@ -152,7 +152,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check Heating Mode Off by setting 4.5 degrees', (done) => {
+  it('HomeKit-CCU check Heating Mode Off by setting 4.5 degrees', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.0123456789ABCD:2.SET_TEMPERATURE', 4.5)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.Thermostat)

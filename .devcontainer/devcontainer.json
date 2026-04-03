@@ -1,5 +1,5 @@
 {
-  "name": "hap-homematic on OpenCCU",
+  "name": "homekit-ccu on OpenCCU",
   "dockerComposeFile": "docker-compose.yml",
   "service": "ccu",
   "workspaceFolder": "/workspace",
@@ -13,7 +13,7 @@
         "Anthropic.claude-code"
       ],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.defaultProfile.linux": "sh",
         "dev.containers.dockerPath": "podman",
         "dev.containers.dockerComposePath": "podman compose"
       }

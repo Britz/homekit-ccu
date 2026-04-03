@@ -12,7 +12,7 @@ log.setDebugEnabled()
 
 const testCase = 'HM-Sec-Sir-WM.json'
 
-describe('HAP-Homematic Tests ' + testCase, () => {
+describe('HomeKit-CCU Tests ' + testCase, () => {
   let that = this
 
   before(async () => {
@@ -40,22 +40,22 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     })
   })
 
-  it('HAP-Homematic check test mode', (done) => {
+  it('HomeKit-CCU check test mode', (done) => {
     expect(that.server.isTestMode).to.be(true)
     done()
   })
 
-  it('HAP-Homematic check number of ccu devices', (done) => {
+  it('HomeKit-CCU check number of ccu devices', (done) => {
     expect(that.server._ccu.getCCUDevices().length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check number of mappend devices', (done) => {
+  it('HomeKit-CCU check number of mappend devices', (done) => {
     expect(Object.keys(that.server._publishedAccessories).length).to.be(1)
     done()
   })
 
-  it('HAP-Homematic check assigned services', (done) => {
+  it('HomeKit-CCU check assigned services', (done) => {
     Object.keys(that.server._publishedAccessories).map(key => {
       let accessory = that.server._publishedAccessories[key]
       expect(accessory.serviceClass).to.be(that.data.ccu[accessory.address()])
@@ -63,7 +63,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     done()
   })
 
-  it('HAP-Homematic check ARMSTATE 0', (done) => {
+  it('HomeKit-CCU check ARMSTATE 0', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.5820259065ABCD:4.ARMSTATE', 0)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.SecuritySystem, 'TestDevice', false, '', true)
@@ -81,7 +81,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     }
   })
 
-  it('HAP-Homematic check ARMSTATE 1', (done) => {
+  it('HomeKit-CCU check ARMSTATE 1', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.5820259065ABCD:4.ARMSTATE', 1)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.SecuritySystem)
@@ -99,7 +99,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     }
   })
 
-  it('HAP-Homematic check ARMSTATE 2', (done) => {
+  it('HomeKit-CCU check ARMSTATE 2', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.5820259065ABCD:4.ARMSTATE', 2)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.SecuritySystem)
@@ -117,7 +117,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     }
   })
 
-  it('HAP-Homematic check ARMSTATE 3', (done) => {
+  it('HomeKit-CCU check ARMSTATE 3', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.5820259065ABCD:4.ARMSTATE', 3)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.SecuritySystem)
@@ -135,7 +135,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     }
   })
 
-  it('HAP-Homematic check alarm goes off', (done) => {
+  it('HomeKit-CCU check alarm goes off', (done) => {
     that.server._ccu.fireEvent('BidCos-RF.5820259065ABCD:3.STATE', true)
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.SecuritySystem)
@@ -148,7 +148,7 @@ describe('HAP-Homematic Tests ' + testCase, () => {
     }
   })
 
-  it('HAP-Homematic check HomeKit Switch Alarm Off', (done) => {
+  it('HomeKit-CCU check HomeKit Switch Alarm Off', (done) => {
     let accessory = that.server._publishedAccessories[Object.keys(that.server._publishedAccessories)[0]]
     let service = accessory.getService(Service.SecuritySystem)
     let ch = service.getCharacteristic(Characteristic.SecuritySystemTargetState)
