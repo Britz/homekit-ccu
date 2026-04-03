@@ -2,28 +2,27 @@
 
   We will redirect you to the HAP-HomeMatic Configuration, <br />
   if this will not work please user the link for :<br /><br />
-  <a id="https" href="">HTTPS Version</a><br/>
-  <a id="http" href="">HTTP Version</a><br/>
+  <a id="https" href="" target="_top">HTTPS Version</a><br/>
+  <a id="http" href="" target="_top">HTTP Version</a><br/>
 
 </body>
 <script type="text/javascript">
   const queryString = window.location.search
   // Fill the backup
-  document.getElementById('https').href='https://' + window.location.host +':9874/' + queryString
-  document.getElementById('http').href='http://' + window.location.host +':9874/' + queryString
+  document.getElementById('https').href='https://' + window.location.hostname +':49874/' + queryString
+  document.getElementById('http').href='http://' + window.location.hostname +':9874/' + queryString
 
   // Check if the server responds on https
-  let url = 'https://' + window.location.host +':9874/' + queryString
   let img = new Image()
   img.onload = function() {
     console.log("We should use https");
-    window.location.href = 'https://' + window.location.host +':9874/' + queryString
+    window.top.location.href = 'https://' + window.location.hostname +':49874/' + queryString
   }
   img.onerror = function() {
     // the image has failed
     console.log('loading https image failed use http')
-    window.location.href = 'http://' + window.location.host +':9874/' + queryString
+    window.top.location.href = 'http://' + window.location.hostname +':9874/' + queryString
   }
-  img.src = 'https://' + window.location.host +':9874/favicon.ico'
-  
+  img.src = 'https://' + window.location.hostname +':49874/favicon.ico'
+
 </script>
