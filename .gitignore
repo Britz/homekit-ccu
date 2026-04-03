@@ -13,4 +13,7 @@ dist
 node_modules.nosync
 test*.sh
 conf.d
-addon_installer/*
+addon_installer/*.tar.gz
+CLAUDE.md
+.claude-commit-plan.md
+.claude-todos.md
