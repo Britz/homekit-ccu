@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/britz/homekit-ccu.svg?branch=master)](https://travis-ci.org/britz/homekit-ccu)
 [![npm version](https://badge.fury.io/js/homekit-ccu.svg)](https://badge.fury.io/js/homekit-ccu)
 ![Node.js CI](https://github.com/britz/homekit-ccu/workflows/Node.js%20CI/badge.svg)
-[![Slack](https://img.shields.io/badge/Join-Slack-green.svg)](https://join.slack.com/t/neuerworkspac-km37354/shared_invite/zt-hnlaon12-VoVmXUX7lzgOWYCnzb6QnA)
 
 <p align="center">
     <img src="doc/hap_homematic_ui2.png">
