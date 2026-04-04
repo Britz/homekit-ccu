@@ -18,13 +18,16 @@ addon_installer/*
 !addon_installer/VERSION
 !addon_installer/genscript.sh
 !addon_installer/update_script
+!addon_installer/homekit-ccu-*.tar.gz
+!addon_installer/etc/
 !addon_installer/etc/postinstall.sh
 !addon_installer/etc/preinstall.sh
+!addon_installer/etc/www/
 !addon_installer/etc/www/index.html
 !addon_installer/etc/www/update-check.cgi
 !addon_installer/etc/www/homekit-ccu-logo.png
+!addon_installer/rc.d/
 !addon_installer/rc.d/homekit-ccu
-!addon_installer/homekit-ccu-*.tar.gz
 CLAUDE.md
 .claude-commit-plan.md
 .claude-todos.md

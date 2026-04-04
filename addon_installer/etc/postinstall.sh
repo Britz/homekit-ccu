@@ -3,14 +3,15 @@
 ADDONNAME=homekit-ccu
 CONFIG_DIR=/usr/local/etc/config
 ADDON_DIR=/usr/local/addons/${ADDONNAME}
-ADDONWWW_DIR=/usr/local/etc/config/addons/www
+HAPDIR=${ADDON_DIR}/node_modules/${ADDONNAME}
+ADDONWWW_DIR=${CONFIG_DIR}/addons/www
 NPMCACHE_DIR=/tmp/homekit-ccu-cache
 RCD_DIR=${CONFIG_DIR}/rc.d
 ADDONCFG_DIR=${CONFIG_DIR}/addons/${ADDONNAME}
-LOGFILE=/var/log/hmhapinstall.log
+LOGFILE=/var/log/hkccu-install.log
 echo "[Installer]Check existency of the daemon" >>${LOGFILE}
 #check if we have our core module; if not go ahead and call the installer stuff
-if [ ! -f ${ADDON_DIR}/node_modules/homekit-ccu/index.js ]; then
+if [ ! -f ${HAPDIR}/index.js ]; then
 echo "[Installer]Looks like the daemon is not here so start installer" >>${LOGFILE}
 echo "[Installer]Running on node version:" >>${LOGFILE}
 node --version >>${LOGFILE}
@@ -27,9 +28,20 @@ npm i --cache ${NPMCACHE_DIR} ${ADDONCFG_DIR}/etc/homekit-ccu.tgz
 #remove the cache
 rm -R ${NPMCACHE_DIR}
 
+#copy config UI static files so lighttpd serves them directly
+echo "[Installer]installing WebUI files ...">>${LOGFILE}
+mkdir -p ${ADDONWWW_DIR}/${ADDONNAME}
+cp -af ${HAPDIR}/lib/configurationsrv/html/* ${ADDONWWW_DIR}/${ADDONNAME}
+
+# install lighttpd proxy config
+echo "[Installer]installing lighttpd config ...">>${LOGFILE}
+mkdir -p /etc/config/lighttpd
+cp -af ${HAPDIR}/etc/homekit-ccu.conf /etc/config/lighttpd/${ADDONNAME}.conf
+killall -HUP lighttpd 2>/dev/null || true
+
 #create the button in system control
 echo "[Installer]creating HomeKit Button ...">>${LOGFILE}
-node ${ADDON_DIR}/node_modules/${ADDONNAME}/etc/hm_addon.js hap ${ADDON_DIR}/node_modules/${ADDONNAME}/etc/hap_addon.cfg
+node ${HAPDIR}/etc/hm_addon.js hap ${HAPDIR}/etc/hap_addon.cfg
 #create the .nobackup file into the plugin directory to prevent backing up all the node depencities
 echo "[Installer]Adding .nobackup to addon dir ...">>${LOGFILE}
 touch ${ADDON_DIR}/.nobackup

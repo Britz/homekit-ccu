@@ -14,7 +14,7 @@ ADDONCFG_DIR=${CONFIG_DIR}/addons/${ADDONNAME}
 ADDONWWW_DIR=${CONFIG_DIR}/addons/www/${ADDONNAME}
 RCD_DIR=${CONFIG_DIR}/rc.d
 WORKSPACE=/workspace
-LOGFILE=/var/log/hmhapinstall.log
+LOGFILE=/var/log/hkccu-install.log
 
 echo "=== homekit-ccu addon installer (dev mode) ==="
 echo ""

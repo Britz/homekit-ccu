@@ -1,7 +1,7 @@
 #!/bin/tclsh
 
-set version_url "https://raw.githubusercontent.com/britz/hap-homematic/master/addon_installer/VERSION"
-set package_url "https://github.com/britz/hap-homematic/releases/latest"
+set version_url "https://raw.githubusercontent.com/britz/homekit-ccu/master/package.json"
+set package_url "https://github.com/britz/homekit-ccu/releases/latest"
 
 catch {
   set input $env(QUERY_STRING)
@@ -19,7 +19,8 @@ if { [info exists cmd ] && $cmd == "download"} {
 } else {
   puts -nonewline "Content-Type: text/plain; charset=utf-8\r\n\r\n"
   catch {
-    set newversion [ exec /usr/bin/wget -qO- --no-check-certificate $version_url ]
+    set json [ exec /usr/bin/wget -qO- --no-check-certificate $version_url ]
+    regexp {"version"\s*:\s*"([^"]+)"} $json -> newversion
   }
   if { [info exists newversion] } {
     puts $newversion

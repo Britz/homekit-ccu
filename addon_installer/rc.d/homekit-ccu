@@ -1,0 +1,115 @@
+#!/bin/sh
+ADDON_NAME=homekit-ccu
+HAPDIR=/usr/local/addons/homekit-ccu/node_modules/homekit-ccu
+HAPROOT=/usr/local/addons/homekit-ccu/
+CONFIG_URL=/addons/homekit-ccu/index.html
+CONFIG_DIR=/usr/local/etc/config
+ADDONCFG_DIR=${CONFIG_DIR}/addons/${ADDON_NAME}
+PIDFILE=/var/run/homekit-ccu.pid
+VER=0.0.64
+NODE_VER=20.18.3
+EXEC=node
+EXECARGS=$HAPDIR/index.js
+
+do_start()
+{
+	# ensure compatible Node.js is available
+	if [ -e $ADDONCFG_DIR/etc/preinstall.sh ];then
+	  $ADDONCFG_DIR/etc/preinstall.sh
+	fi
+	# run installer if needed
+  	if [ -e $ADDONCFG_DIR/etc/postinstall.sh ];then
+	  $ADDONCFG_DIR/etc/postinstall.sh
+	fi
+	start-stop-daemon --start --quiet --oknodo --make-pidfile --background  --pidfile $PIDFILE --exec $EXEC $EXECARGS
+	logger -t homematic -p user.info "start homekit-ccu"
+}
+
+do_stop()
+{
+    start-stop-daemon --stop --quiet  --oknodo  --retry 5  --pidfile $PIDFILE
+
+    if [ -e $PIDFILE ];then
+      rm -f $PIDFILE
+    fi
+
+	sleep 2
+	pgrep -f '^homekit-ccu-.*' | xargs kill -9
+	logger -t homematic -p user.info "stopped homekit-ccu"
+}
+
+
+case "$1" in
+  ""|start)
+
+	do_start
+
+	;;
+
+  stop)
+
+	do_stop
+
+	;;
+
+  restart)
+
+	do_stop
+	sleep 10
+	do_start
+
+	;;
+
+  info)
+	echo "Info: <center><b>HomeKit CCU</b><p style='margin-top: 5px;margin-bottom: 5px;'><img src='../addons/homekit-ccu/homekit-ccu-logo.png'></p></center>HomeMatic/HomeMatic IP goes Apple Homekit<br /><a href='https://github.com/britz/homekit-ccu/'>https://github.com/britz/homekit-ccu/</a>"
+	echo "Name: HomeKit CCU"
+	echo "Version: $VER (Node $NODE_VER)"
+	echo "Operations: uninstall restart"
+	echo "Config-Url: $CONFIG_URL"
+	echo "Update: /addons/${ADDON_NAME}/update-check.cgi"
+	;;
+
+  uninstall)
+	logger -t homematic -p user.info "removing homekit-ccu"
+	kill -KILL $PSPID 2>/dev/null
+	node /usr/local/addons/homekit-ccu/node_modules/homekit-ccu/etc/hm_addon.js hap
+	rm -R /usr/local/addons/homekit-ccu/
+    rm /usr/local/etc/config/rc.d/homekit-ccu
+	rm -R /usr/local/etc/config/addons/www/homekit-ccu
+	rm -R /usr/local/etc/config/addons/homekit-ccu
+	rm -f /etc/config/lighttpd/homekit-ccu.conf
+	killall -HUP lighttpd 2>/dev/null
+
+	# remove firewall ports via TCL library
+	if [ -f /lib/libfirewall.tcl ]; then
+	  tclsh - <<'FWEOF'
+source /lib/libfirewall.tcl
+Firewall_loadConfiguration
+global Firewall_USER_PORTS
+foreach port {9874 49874} {
+  set idx [lsearch $Firewall_USER_PORTS $port]
+  if {$idx != -1} {
+    set Firewall_USER_PORTS [lreplace $Firewall_USER_PORTS $idx $idx]
+  }
+}
+Firewall_saveConfiguration
+Firewall_configureFirewall
+FWEOF
+	fi
+
+	# remove the monit settings if there are leftovers
+	if [ -f /usr/local/etc/monit_homekit-ccu.cfg ]; then
+	  rm /usr/local/etc/monit_homekit-ccu.cfg
+	  # and reload the monit
+	  /usr/bin/monit reload
+	fi
+
+	;;
+
+  *)
+	echo "Usage: $0 {start|stop|restart|uninstall}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

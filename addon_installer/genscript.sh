@@ -30,6 +30,7 @@ sed -i "s/^VER=.*/VER=${VERSION}/" tmp/rc.d/homekit-ccu
 
 # generate archive
 cd tmp
+chmod +x update_script
 tar --exclude=._* --exclude=.DS_Store -czvf ../homekit-ccu-${VERSION}.tar.gz *
 cd ..
 rm -rf tmp

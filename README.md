@@ -156,6 +156,9 @@ A devcontainer in `.devcontainer/` provides a full OpenCCU environment for devel
 
 # Run in foreground with debug output:
 node index.js -D
+
+# Restart lighttpd:
+killall lighttpd; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
 ```
 
 The OpenCCU WebUI is available at `http://localhost:8080` from the host. The addon button appears under System Control after running `install-addon.sh`.

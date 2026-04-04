@@ -11,7 +11,7 @@
 
 REQUIRED_MAJOR=20
 NODE_VERSION="20.18.3"
-LOGFILE=/var/log/hmhapinstall.log
+LOGFILE=/var/log/hkccu-install.log
 
 log() {
   echo "[Preinstall] $1" >>${LOGFILE}
