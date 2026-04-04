@@ -9,18 +9,23 @@ NPMCACHE_DIR=/tmp/homekit-ccu-cache
 RCD_DIR=${CONFIG_DIR}/rc.d
 ADDONCFG_DIR=${CONFIG_DIR}/addons/${ADDONNAME}
 LOGFILE=/var/log/hkccu-install.log
-echo "[Installer]Check existency of the daemon" >>${LOGFILE}
+
+log() {
+  echo "$(date) [Postinstall] $*" | tee -a ${LOGFILE}
+}
+
+log "Check existency of the daemon" 
 #check if we have our core module; if not go ahead and call the installer stuff
 if [ ! -f ${HAPDIR}/index.js ]; then
-echo "[Installer]Looks like the daemon is not here so start installer" >>${LOGFILE}
-echo "[Installer]Running on node version:" >>${LOGFILE}
-node --version >>${LOGFILE}
-echo "[Installer]NPM is :" >>${LOGFILE}
-npm --version >>${LOGFILE}
+log "Looks like the daemon is not here so start installer" 
+log "Running on node version:" 
+node --version | tee -a ${LOGFILE}
+log "NPM is :" 
+npm --version | tee -a ${LOGFILE}
 
-echo "[Installer]Program Dir is ${ADDON_DIR}" >>${LOGFILE}
+log "Program Dir is ${ADDON_DIR}" 
 
-echo "[Installer]installing HomeKit-CCU ...">>${LOGFILE}
+log "installing HomeKit-CCU ..."
 #create a cache in /tmp
 mkdir ${NPMCACHE_DIR}
 cd ${ADDON_DIR}
@@ -29,23 +34,23 @@ npm i --cache ${NPMCACHE_DIR} ${ADDONCFG_DIR}/etc/homekit-ccu.tgz
 rm -R ${NPMCACHE_DIR}
 
 #copy config UI static files so lighttpd serves them directly
-echo "[Installer]installing WebUI files ...">>${LOGFILE}
+log "installing WebUI files ..."
 mkdir -p ${ADDONWWW_DIR}/${ADDONNAME}
 cp -af ${HAPDIR}/lib/configurationsrv/html/* ${ADDONWWW_DIR}/${ADDONNAME}
 
 # install lighttpd proxy config
-echo "[Installer]installing lighttpd config ...">>${LOGFILE}
+log "installing lighttpd config ..."
 mkdir -p /etc/config/lighttpd
 cp -af ${HAPDIR}/etc/homekit-ccu.conf /etc/config/lighttpd/${ADDONNAME}.conf
-killall -HUP lighttpd 2>/dev/null || true
+killall lighttpd 2>/dev/null; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
 
 #create the button in system control
-echo "[Installer]creating HomeKit Button ...">>${LOGFILE}
+log "creating HomeKit Button ..."
 node ${HAPDIR}/etc/hm_addon.js hap ${HAPDIR}/etc/hap_addon.cfg
 #create the .nobackup file into the plugin directory to prevent backing up all the node depencities
-echo "[Installer]Adding .nobackup to addon dir ...">>${LOGFILE}
+log "Adding .nobackup to addon dir ..."
 touch ${ADDON_DIR}/.nobackup
-echo "[Installer]we are done ...">>${LOGFILE}
+log "we are done ..."
 else
-echo "[Installer]daemon exists lets light this candle" >>${LOGFILE}
+log "daemon exists lets light this candle" 
 fi

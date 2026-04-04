@@ -14,8 +14,7 @@ NODE_VERSION="20.18.3"
 LOGFILE=/var/log/hkccu-install.log
 
 log() {
-  echo "[Preinstall] $1" >>${LOGFILE}
-  echo "[Preinstall] $1"
+  echo "$(date) [Preinstall] $1" | tee -a ${LOGFILE}
 }
 
 # Detect architecture

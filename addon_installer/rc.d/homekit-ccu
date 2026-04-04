@@ -8,29 +8,48 @@ ADDONCFG_DIR=${CONFIG_DIR}/addons/${ADDON_NAME}
 PIDFILE=/var/run/homekit-ccu.pid
 VER=0.0.64
 NODE_VER=20.18.3
-EXEC=node
-EXECARGS=$HAPDIR/index.js
+LOGFILE=/var/log/hkccu-server.log
+
+log() {
+  echo "$(date) [HomeKit-CCU] $*" | tee -a ${LOGFILE}
+}
 
 do_start()
 {
 	# ensure compatible Node.js is available
 	if [ -e $ADDONCFG_DIR/etc/preinstall.sh ];then
+	  log "start homekit-ccu preinstall"
 	  $ADDONCFG_DIR/etc/preinstall.sh
 	fi
 	# run installer if needed
   	if [ -e $ADDONCFG_DIR/etc/postinstall.sh ];then
+	  log "start homekit-ccu postinstall"
 	  $ADDONCFG_DIR/etc/postinstall.sh
 	fi
-	start-stop-daemon --start --quiet --oknodo --make-pidfile --background  --pidfile $PIDFILE --exec $EXEC $EXECARGS
+	log "start homekit-ccu"
+	start-stop-daemon --start --quiet --oknodo --make-pidfile --background --pidfile $PIDFILE --exec $ADDONCFG_DIR/etc/start.sh
 	logger -t homematic -p user.info "start homekit-ccu"
 }
 
 do_stop()
 {
-    start-stop-daemon --stop --quiet  --oknodo  --retry 5  --pidfile $PIDFILE
+	log "stop server"
+    start-stop-daemon --stop --quiet --oknodo --retry 5 --pidfile $PIDFILE
 
     if [ -e $PIDFILE ];then
+	  log "remove  $PIDFILE"
       rm -f $PIDFILE
+    fi
+
+	if [ -e $LOGFILE ];then
+	  local DATELOG="$(dirname $LOGFILE)/$(date -I)-$(basename $LOGFILE)"
+	  log "rotate logfile to $DATELOG"
+	  if [ -e $LOGFILE ];then
+	 	cat $LOGFILE >> $DATELOG
+		rm $LOGFILE
+	  else
+     	mv $LOGFILE $DATELOG
+	  fi
     fi
 
 	sleep 2
@@ -78,7 +97,7 @@ case "$1" in
 	rm -R /usr/local/etc/config/addons/www/homekit-ccu
 	rm -R /usr/local/etc/config/addons/homekit-ccu
 	rm -f /etc/config/lighttpd/homekit-ccu.conf
-	killall -HUP lighttpd 2>/dev/null
+	killall lighttpd 2>/dev/null; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
 
 	# remove firewall ports via TCL library
 	if [ -f /lib/libfirewall.tcl ]; then

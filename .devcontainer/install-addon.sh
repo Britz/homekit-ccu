@@ -97,7 +97,7 @@ FWEOF
   echo "  Opened ports 9874, 49874 in firewall"
 fi
 # Reload lighttpd to pick up the new proxy config
-killall -HUP lighttpd 2>/dev/null || true
+killall lighttpd 2>/dev/null; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
 echo "  ${ADDONWWW_DIR}/index.html"
 echo "  /etc/config/lighttpd/${ADDONNAME}.conf"
 

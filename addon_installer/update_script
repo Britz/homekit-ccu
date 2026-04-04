@@ -58,10 +58,12 @@ fi
 # copy startup script
 cp -af rc.d/* ${RCD_DIR}
 # copy installer
-cp -af hap/etc/postinstall.sh ${ADDONCFG_DIR}/etc
-chmod +x ${ADDONCFG_DIR}/etc/postinstall.sh
 cp -af hap/etc/preinstall.sh ${ADDONCFG_DIR}/etc
 chmod +x ${ADDONCFG_DIR}/etc/preinstall.sh
+cp -af hap/etc/start.sh ${ADDONCFG_DIR}/etc
+chmod +x ${ADDONCFG_DIR}/etc/start.sh
+cp -af hap/etc/postinstall.sh ${ADDONCFG_DIR}/etc
+chmod +x ${ADDONCFG_DIR}/etc/postinstall.sh
 # copy the npm package so postinstall.sh can install from it after reboot
 cp -af hap/etc/homekit-ccu.tgz ${ADDONCFG_DIR}/etc/homekit-ccu.tgz
 
