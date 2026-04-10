@@ -52,7 +52,7 @@ echo "  ${ADDONCFG_DIR}/etc"
 echo "  ${ADDONWWW_DIR}"
 
 # ---- 3. Install via symlink instead of npm ----
-# The real postinstall.sh does: cd $ADDON_DIR && npm i homekit-ccu.tgz
+# The real rc.d install does: cd $ADDON_DIR && npm i homekit-ccu.tgz
 # We create the same node_modules/homekit-ccu path but as a symlink
 # to /workspace so live edits take effect immediately.
 echo "[3/6] Linking workspace as installed addon..."
@@ -66,7 +66,7 @@ if [ ! -d node_modules ]; then
   echo "  Running npm install (first time)..."
   npm install --loglevel=error
 fi
-# Marker file the postinstall.sh checks to skip re-install
+# Marker file — prevents RaspberryMatic backup from including node_modules
 touch "${ADDON_DIR}/.nobackup"
 echo "  -> ${ADDON_DIR}/node_modules/${ADDONNAME} -> ${WORKSPACE}"
 
@@ -105,10 +105,6 @@ echo "  /etc/config/lighttpd/${ADDONNAME}.conf"
 echo "[5/6] Installing rc.d init script..."
 cp -f "${WORKSPACE}/addon_installer/rc.d/${ADDONNAME}" "${RCD_DIR}/${ADDONNAME}"
 chmod +x "${RCD_DIR}/${ADDONNAME}"
-# Copy the postinstall.sh (rc.d calls it on start, but it will be a no-op
-# since index.js already exists via symlink)
-cp -f "${WORKSPACE}/addon_installer/etc/postinstall.sh" "${ADDONCFG_DIR}/etc/"
-chmod +x "${ADDONCFG_DIR}/etc/postinstall.sh"
 echo "  ${RCD_DIR}/${ADDONNAME}"
 
 # ---- 6. Register addon button in CCU WebUI ----

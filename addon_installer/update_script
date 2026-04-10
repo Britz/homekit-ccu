@@ -11,18 +11,13 @@ RCD_DIR=${CONFIG_DIR}/rc.d
 # make sure this addon is only executed on
 # supported platforms
 
-if [ "$1" == "HM-RASPBERRYMATIC" ]  || [ "$1" == "CCU3" ] ; then
+if [ "$1" == "HM-RASPBERRYMATIC" ] || [ "$1" == "CCU3" ] ; then
 
 mount | grep /usr/local 2>&1 >/dev/null
 if [ $? -eq 1 ]; then
   mount /usr/local
 fi
 
-# ensure a compatible Node.js version is available
-cp -af hap/etc/preinstall.sh /tmp/preinstall.sh
-chmod +x /tmp/preinstall.sh
-/tmp/preinstall.sh
-rm -f /tmp/preinstall.sh
 
 # create necessary directories
 mkdir -p ${ADDON_DIR}
@@ -55,16 +50,9 @@ Firewall_configureFirewall
 FWEOF
 fi
 
-# copy startup script
+# copy rc.d script (contains install, uninstall, start, stop, etc.)
 cp -af rc.d/* ${RCD_DIR}
-# copy installer
-cp -af hap/etc/preinstall.sh ${ADDONCFG_DIR}/etc
-chmod +x ${ADDONCFG_DIR}/etc/preinstall.sh
-cp -af hap/etc/start.sh ${ADDONCFG_DIR}/etc
-chmod +x ${ADDONCFG_DIR}/etc/start.sh
-cp -af hap/etc/postinstall.sh ${ADDONCFG_DIR}/etc
-chmod +x ${ADDONCFG_DIR}/etc/postinstall.sh
-# copy the npm package so postinstall.sh can install from it after reboot
+# copy the npm package so the install function can install from it
 cp -af hap/etc/homekit-ccu.tgz ${ADDONCFG_DIR}/etc/homekit-ccu.tgz
 
 #build system launcher
@@ -73,16 +61,16 @@ chmod +x ${ADDONWWW_DIR}/${ADDONNAME}/update-check.cgi
 
 sync
 
-#check if the plugin is allready installd
-if [ ! -f ${ADDON_DIR}/node_modules/homekit-ccu/index.js ]; then
-# new installation — reboot so the launcher runs postinstall.sh on first boot
-  exit 10
-else
-# update — remove old package so postinstall.sh reinstalls from the new tgz, then restart
-  ${RCD_DIR}/${ADDONNAME} stop
-  rm -rf ${ADDON_DIR}/node_modules/homekit-ccu
-  ${RCD_DIR}/${ADDONNAME} start
-  exit 0
-fi
+# install npm package, lighttpd config, WebUI button
+# (handles stopping and removing old package if present)
+echo "start homekit-ccu install" >&2
+${RCD_DIR}/${ADDONNAME} install
 
+# start the service
+${RCD_DIR}/${ADDONNAME} start
+exit 0
+
+else
+  echo "ERROR: unsupported platform '$1'" >&2
+  exit 1
 fi

@@ -1,3 +1,20 @@
+Changelog for 0.0.16:
+====================
+
+* Fixed Rega timeout causing full server crash — unhandledRejection now logged without process exit
+* Added .catch() to all Rega Promise chains (fetchAllDevices, fetchRooms, hazDatapoint, setValue, setVariable, getVariableValue, runProgram, auth checks) — Rega errors no longer crash the server
+* Rega requests are now serialised via a module-level queue — prevents socket hang-ups when Apple Home or the wizard triggers concurrent Rega calls
+* Rega script() now retries up to 3 times with 5s delay on transient failures; ping uses 0 retries with 5s timeout
+* pingRega uses a short 5s timeout; unexpected Rega responses are now logged verbatim
+* getValue() now fires events on cache hits — fixes registerAddressForEventProcessingAtAccessory needing ignoreCache=true workaround
+* Fixed compatibleObjects IPC handler not calling sendObjects() — UI now updates when device list is loaded
+* Removed npm registry version check — was always failing (package not public) and logging noise on every UI load
+* Fixed console() typo (should be console.log) in configurationsrv shutdown handler
+* Removed empty NotFound RPC handler, unused getValue()/callback param in setVariable, empty init() method
+* addon rc.d script refactored: unified install/uninstall/start/stop functions, proper stop before reinstall on update
+* update_script: on reinstall removes old package so postinstall runs with the new tgz, then restarts service
+* uninstall: uses do_stop() instead of undefined $PSPID; pgrep pattern fixed; -r flag on xargs prevents error with no matches
+
 Changelog for 0.0.15:
 ====================
 

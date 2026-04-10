@@ -1,107 +1,133 @@
 #!/bin/sh
 ADDON_NAME=homekit-ccu
-HAPDIR=/usr/local/addons/homekit-ccu/node_modules/homekit-ccu
-HAPROOT=/usr/local/addons/homekit-ccu/
-CONFIG_URL=/addons/homekit-ccu/index.html
+ADDON_DIR=/usr/local/addons/${ADDON_NAME}
+HAPDIR=${ADDON_DIR}/node_modules/${ADDON_NAME}
+HAPROOT=${ADDON_DIR}/
+CONFIG_URL=/addons/${ADDON_NAME}/index.html
 CONFIG_DIR=/usr/local/etc/config
 ADDONCFG_DIR=${CONFIG_DIR}/addons/${ADDON_NAME}
+ADDONWWW_DIR=${CONFIG_DIR}/addons/www/${ADDON_NAME}
+NPMCACHE_DIR=/tmp/homekit-ccu-cache
+RCD_DIR=${CONFIG_DIR}/rc.d
 PIDFILE=/var/run/homekit-ccu.pid
 VER=0.0.64
 NODE_VER=20.18.3
+REQUIRED_MAJOR=20
 LOGFILE=/var/log/hkccu-server.log
 
+# ------------------------------------------------------------------
+# Helper functions
+# ------------------------------------------------------------------
+
 log() {
-  echo "$(date) [HomeKit-CCU] $*" | tee -a ${LOGFILE}
+  echo "$(date) [HomeKit-CCU: $1] ${*:2}" | tee -a ${LOGFILE}
+  logger -t homekit-ccu -p user.info "$*"
 }
 
-do_start()
+usage(){
+	cmds=$(grep -oP '^\w+(?=\(\))' "$0" | grep -v '^usage$\|^log$\|^detect_\|^check_\|^remove_\|^uninstall_' | tr '\n' '|' | sed 's/|$//')
+	echo "Usage: $0 {${cmds}}" >&2
+}
+
+run_server()
 {
-	# ensure compatible Node.js is available
-	if [ -e $ADDONCFG_DIR/etc/preinstall.sh ];then
-	  log "start homekit-ccu preinstall"
-	  $ADDONCFG_DIR/etc/preinstall.sh
-	fi
-	# run installer if needed
-  	if [ -e $ADDONCFG_DIR/etc/postinstall.sh ];then
-	  log "start homekit-ccu postinstall"
-	  $ADDONCFG_DIR/etc/postinstall.sh
-	fi
-	log "start homekit-ccu"
-	start-stop-daemon --start --quiet --oknodo --make-pidfile --background --pidfile $PIDFILE --exec $ADDONCFG_DIR/etc/start.sh
-	logger -t homematic -p user.info "start homekit-ccu"
+	exec node $HAPDIR/index.js 2>&1 | tee -a $LOGFILE 
 }
 
-do_stop()
-{
-	log "stop server"
-    start-stop-daemon --stop --quiet --oknodo --retry 5 --pidfile $PIDFILE
+# ------------------------------------------------------------------
+# Install functions
+# ------------------------------------------------------------------
 
-    if [ -e $PIDFILE ];then
-	  log "remove  $PIDFILE"
-      rm -f $PIDFILE
-    fi
-
-	if [ -e $LOGFILE ];then
-	  local DATELOG="$(dirname $LOGFILE)/$(date -I)-$(basename $LOGFILE)"
-	  log "rotate logfile to $DATELOG"
-	  if [ -e $LOGFILE ];then
-	 	cat $LOGFILE >> $DATELOG
-		rm $LOGFILE
-	  else
-     	mv $LOGFILE $DATELOG
-	  fi
-    fi
-
-	sleep 2
-	pgrep -f 'homekit-ccu' | xargs -r kill -9 2>/dev/null
-	logger -t homematic -p user.info "stopped homekit-ccu"
+detect_arch() {
+  ARCH=$(uname -m)
+  case "${ARCH}" in
+    aarch64|arm64) echo "arm64" ;;
+    x86_64|amd64)  echo "x64" ;;
+    *)
+      log "install" "ERROR: unsupported architecture: ${ARCH}"
+      return 1
+      ;;
+  esac
 }
 
+check_node_version() {
+  if ! command -v node >/dev/null 2>&1; then
+    log "install" "ERROR: Node.js not found in PATH"
+    return 1
+  fi
 
-case "$1" in
-  ""|start)
+  CURRENT_VERSION=$(node --version 2>/dev/null)
+  if [ -z "${CURRENT_VERSION}" ]; then
+    log "install" "ERROR: Node.js found but could not determine version"
+    return 1
+  fi
 
-	do_start
+  CURRENT_MAJOR=$(echo "${CURRENT_VERSION}" | sed 's/^v//' | cut -d. -f1)
 
-	;;
+  if [ "${CURRENT_MAJOR}" -ge "${REQUIRED_MAJOR}" ] 2>/dev/null; then
+    log "install" "Node.js ${CURRENT_VERSION} meets requirement (>=${REQUIRED_MAJOR})"
+    return 0
+  else
+    log "install" "ERROR: Node.js ${CURRENT_VERSION} is too old (need >=${REQUIRED_MAJOR})"
+    return 1
+  fi
+}
 
-  stop)
+install() {
+  check_node_version || return 1
 
-	do_stop
+  if [ -f ${HAPDIR}/index.js ]; then
+    log "install" "Existing installation found, removing package first..."
+    uninstall_app
+  fi
 
-	;;
+  log "install" "Starting install"
+  log "install" "Running on node version: $(node --version)"
+  log "install" "NPM is: $(npm --version)"
+  log "install" "Program Dir is ${ADDON_DIR}"
+  log "install" "installing HomeKit-CCU ..."
+  mkdir -p ${NPMCACHE_DIR}
+  cd ${ADDON_DIR}
+  npm i --cache ${NPMCACHE_DIR} ${ADDONCFG_DIR}/etc/homekit-ccu.tgz
+  rm -rf ${NPMCACHE_DIR}
 
-  restart)
+  log "install" "installing WebUI files ..."
+  mkdir -p ${ADDONWWW_DIR}
+  cp -af ${HAPDIR}/lib/configurationsrv/html/* ${ADDONWWW_DIR}
 
-	do_stop
-	sleep 10
-	do_start
+  log "install" "installing lighttpd config ..."
+  mkdir -p /etc/config/lighttpd
+  cp -af ${HAPDIR}/etc/homekit-ccu.conf /etc/config/lighttpd/${ADDON_NAME}.conf
+  killall lighttpd 2>/dev/null; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
 
-	;;
+  log "install" "creating HomeKit Button ..."
+  node ${HAPDIR}/etc/hm_addon.js hap ${HAPDIR}/etc/hap_addon.cfg
 
-  info)
-	echo "Info: <center><b>HomeKit CCU</b><p style='margin-top: 5px;margin-bottom: 5px;'><img src='../addons/homekit-ccu/homekit-ccu-logo.png'></p></center>HomeMatic/HomeMatic IP goes Apple Homekit<br /><a href='https://github.com/britz/homekit-ccu/'>https://github.com/britz/homekit-ccu/</a>"
-	echo "Name: HomeKit CCU"
-	echo "Version: $VER (Node $NODE_VER)"
-	echo "Operations: uninstall restart"
-	echo "Config-Url: $CONFIG_URL"
-	echo "Update: /addons/${ADDON_NAME}/update-check.cgi"
-	;;
+  log "install" "Adding .nobackup to addon dir ..."
+  touch ${ADDON_DIR}/.nobackup
 
-  uninstall)
-	logger -t homematic -p user.info "removing homekit-ccu"
-	do_stop
-	node /usr/local/addons/homekit-ccu/node_modules/homekit-ccu/etc/hm_addon.js hap
-	rm -rf /usr/local/addons/homekit-ccu/
-	rm -f /usr/local/etc/config/rc.d/homekit-ccu
-	rm -rf /usr/local/etc/config/addons/www/homekit-ccu
-	rm -rf /usr/local/etc/config/addons/homekit-ccu
-	rm -f /etc/config/lighttpd/homekit-ccu.conf
-	killall lighttpd 2>/dev/null; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
+  log "install" "install complete"
+}
 
-	# remove firewall ports via TCL library
-	if [ -f /lib/libfirewall.tcl ]; then
-	  tclsh - <<'FWEOF'
+# ------------------------------------------------------------------
+# Uninstall functions
+# ------------------------------------------------------------------
+
+# Uninstall all configurations
+uninstall_config() {
+  #remove_addon_config
+  log "uninstall" "Removing addon config..."
+  rm -rf ${ADDONCFG_DIR}
+
+  # remove_lighttpd_config
+  log "uninstall" "Removing lighttpd config and reloading..."
+  rm -f /etc/config/lighttpd/${ADDON_NAME}.conf
+  killall lighttpd 2>/dev/null; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
+
+  # remove_firewall_ports
+  if [ -f /lib/libfirewall.tcl ]; then
+    log "uninstall" "Removing firewall ports..."
+    tclsh - <<'FWEOF'
 source /lib/libfirewall.tcl
 Firewall_loadConfiguration
 global Firewall_USER_PORTS
@@ -114,21 +140,102 @@ foreach port {9874 49874} {
 Firewall_saveConfiguration
 Firewall_configureFirewall
 FWEOF
-	fi
+  fi
 
-	# remove the monit settings if there are leftovers
-	if [ -f /usr/local/etc/monit_homekit-ccu.cfg ]; then
-	  rm /usr/local/etc/monit_homekit-ccu.cfg
-	  # and reload the monit
-	  /usr/bin/monit reload
-	fi
+  # remove_monit_config
+  if [ -f /usr/local/etc/monit_${ADDON_NAME}.cfg ]; then
+    log "uninstall" "Removing monit config..."
+    rm /usr/local/etc/monit_${ADDON_NAME}.cfg
+    /usr/bin/monit reload
+  fi
+  log "uninstall" "Config removal complete."
+}
 
-	;;
+# Uninstall programm componente keeping the config (for reinstall)
+uninstall_app() {
+  stop
+   # remove WebUI button
+  if [ -f ${HAPDIR}/etc/hm_addon.js ]; then
+    log "uninstall" "Removing WebUI button..."
+    node ${HAPDIR}/etc/hm_addon.js hap 2>/dev/null
+  fi
 
-  *)
-	echo "Usage: $0 {start|stop|restart|uninstall}" >&2
-	exit 1
-	;;
-esac
+  # remove addon directory
+  log "uninstall" "Removing addon directory..."
+  rm -rf ${ADDON_DIR}/
 
-exit 0
+  # remove RCD script
+  log "uninstall" "Removing rc.d script..."
+  rm -f ${RCD_DIR}/${ADDON_NAME}
+
+  # remove www_files
+  log "uninstall" "Removing www files..."
+  rm -rf ${ADDONWWW_DIR}
+
+  # remove npm cache if left over from interrupted install
+  rm -rf ${NPMCACHE_DIR}
+
+  log "uninstall" "Server removal complete."
+}
+
+# Full Uninstall
+uninstall() {
+  log "uninstall" "Removing HomeKit-CCU."
+  uninstall_app
+  uninstall_config
+  log "uninstall" "Uninstall complete."
+}
+
+# ------------------------------------------------------------------
+# Daemon functions required by CCU
+# ------------------------------------------------------------------
+
+start()
+{
+	log "start" "Starting HomeKit-CCU."
+	start-stop-daemon --start --quiet --oknodo --make-pidfile --background --pidfile $PIDFILE --startas "$0" -- run_server
+	log "start" "HomeKit-CCU started."
+}
+
+stop()
+{
+	log "stop" "Stopping HomeKit-CCU."
+    start-stop-daemon --stop --quiet --oknodo --retry 5 --pidfile $PIDFILE
+    if [ -e $PIDFILE ];then
+	  log "stop" "Removing PIDFILE: $PIDFILE."
+      rm -f $PIDFILE
+    fi
+	sleep 2
+	pgrep -f 'homekit-ccu' | xargs -r kill -9 2>/dev/null
+ 	log "stop" "HomeKit-CCU stopped."
+}
+
+restart()
+{
+	log "restart" "Performing a HomeKit-CCU start & stop cycle"
+	stop
+	log "restart" "Wating a short time before restart"
+	sleep 10
+	start
+}
+
+info(){
+	echo "Info: <center><b>HomeKit-CCU</b><p style='margin-top: 5px;margin-bottom: 5px;'><img src='../addons/homekit-ccu/homekit-ccu-logo.png'></p></center>HomeMatic/HomeMatic IP goes Apple Homekit<br /><a href='https://github.com/britz/homekit-ccu/'>https://github.com/britz/homekit-ccu/</a>"
+	echo "Name: HomeKit-CCU"
+	echo "Version: $VER (Node $NODE_VER)"
+	echo "Operations: uninstall restart"
+	echo "Config-Url: $CONFIG_URL"
+	echo "Update: /addons/${ADDON_NAME}/update-check.cgi"
+}
+
+# ------------------------------------------------------------------
+# Runtime logic
+# ------------------------------------------------------------------
+
+CMD="${1:-start}"
+if type "$CMD" 2>/dev/null | grep -q 'function'; then
+  "$CMD"
+else
+  usage
+  exit 1
+fi

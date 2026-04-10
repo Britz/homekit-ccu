@@ -11,7 +11,7 @@ mkdir -p tmp/hap/etc
 mkdir -p tmp/www
 
 # Build the npm package and include it in the archive
-# The CCU's postinstall.sh will install from this tgz (no public registry needed)
+# The rc.d install function will install from this tgz (no public registry needed)
 cd ..
 npm pack
 TGZFILE=$(ls homekit-ccu-*.tgz | tail -1)

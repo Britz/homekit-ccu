@@ -20,9 +20,6 @@ addon_installer/*
 !addon_installer/update_script
 !addon_installer/homekit-ccu-*.tar.gz
 !addon_installer/etc/
-!addon_installer/etc/postinstall.sh
-!addon_installer/etc/preinstall.sh
-!addon_installer/etc/start.sh
 !addon_installer/etc/www/
 !addon_installer/etc/www/index.html
 !addon_installer/etc/www/update-check.cgi

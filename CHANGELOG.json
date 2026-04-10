@@ -1,5 +1,22 @@
 {
     "versions": {
+        "0.0.16": {
+            "descriptions": [
+                "Fixed Rega timeout causing full server crash — unhandledRejection now logged without process exit",
+                "Added .catch() to all Rega Promise chains — Rega errors no longer crash the server",
+                "Rega requests serialised via module-level queue — prevents socket hang-ups on concurrent calls",
+                "Rega script() retries up to 3 times with 5s delay; ping uses 0 retries with 5s timeout",
+                "getValue() fires events on cache hits — fixes registerAddressForEventProcessingAtAccessory workaround",
+                "Fixed compatibleObjects IPC handler not calling sendObjects() — UI now updates when device list loads",
+                "Removed npm registry version check — was always failing and logging noise on every UI load",
+                "Fixed console() typo in configurationsrv shutdown handler",
+                "Removed dead code: empty NotFound RPC handler, unused callback param, empty init() method",
+                "addon rc.d script refactored: unified install/uninstall/start/stop functions",
+                "update_script: reinstall removes old package so postinstall runs with new tgz, then restarts",
+                "uninstall: fixed undefined $PSPID, corrected pgrep pattern, added xargs -r to suppress errors"
+            ],
+            "issues": []
+        },
         "0.0.64": {
             "descriptions": [
                 "OpenCCU compatibility",
