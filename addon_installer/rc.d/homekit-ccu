@@ -53,7 +53,7 @@ do_stop()
     fi
 
 	sleep 2
-	pgrep -f '^homekit-ccu-.*' | xargs kill -9
+	pgrep -f 'homekit-ccu' | xargs -r kill -9 2>/dev/null
 	logger -t homematic -p user.info "stopped homekit-ccu"
 }
 
@@ -90,12 +90,12 @@ case "$1" in
 
   uninstall)
 	logger -t homematic -p user.info "removing homekit-ccu"
-	kill -KILL $PSPID 2>/dev/null
+	do_stop
 	node /usr/local/addons/homekit-ccu/node_modules/homekit-ccu/etc/hm_addon.js hap
-	rm -R /usr/local/addons/homekit-ccu/
-    rm /usr/local/etc/config/rc.d/homekit-ccu
-	rm -R /usr/local/etc/config/addons/www/homekit-ccu
-	rm -R /usr/local/etc/config/addons/homekit-ccu
+	rm -rf /usr/local/addons/homekit-ccu/
+	rm -f /usr/local/etc/config/rc.d/homekit-ccu
+	rm -rf /usr/local/etc/config/addons/www/homekit-ccu
+	rm -rf /usr/local/etc/config/addons/homekit-ccu
 	rm -f /etc/config/lighttpd/homekit-ccu.conf
 	killall lighttpd 2>/dev/null; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
 

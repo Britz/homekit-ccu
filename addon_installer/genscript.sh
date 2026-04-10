@@ -28,6 +28,12 @@ cp -a etc tmp/hap
 # Patch the VER= line in the rc.d script with the actual version
 sed -i "s/^VER=.*/VER=${VERSION}/" tmp/rc.d/homekit-ccu
 
+TARFILE=homekit-ccu-${VERSION}.tar.gz
+if [ -e "$TTARFILE" ]; then
+    # tarfile is already there remove it first 
+    rm -f homekit-ccu-${VERSION}.tar.gz
+fi
+
 # generate archive
 cd tmp
 chmod +x update_script
