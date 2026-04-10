@@ -86,6 +86,11 @@ program.option('-P, --password [rpcpassword]', 'set the password for XML-RPC bas
 
   .parse(process.argv)
 
+process.on('unhandledRejection', (reason, promise) => {
+  log.error('[HAP Server] unhandledRejection: %s', reason && reason.stack ? reason.stack : reason)
+  // Do not exit — a Rega timeout or transient error should not crash the server
+})
+
 process.on('uncaughtException', (err) => {
   // Write a crashlog
   const fs = require('fs')
@@ -165,4 +170,3 @@ process.on('SIGINT', () => {
   server.shutdown()
   log.close()
 })
-// useless comment
