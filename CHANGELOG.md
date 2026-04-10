@@ -11,9 +11,18 @@ Changelog for 0.0.16:
 * Removed npm registry version check — was always failing (package not public) and logging noise on every UI load
 * Fixed console() typo (should be console.log) in configurationsrv shutdown handler
 * Removed empty NotFound RPC handler, unused getValue()/callback param in setVariable, empty init() method
-* addon rc.d script refactored: unified install/uninstall/start/stop functions, proper stop before reinstall on update
-* update_script: on reinstall removes old package so postinstall runs with the new tgz, then restarts service
-* uninstall: uses do_stop() instead of undefined $PSPID; pgrep pattern fixed; -r flag on xargs prevents error with no matches
+* Rega queue now rejects all pending requests when Rega is down — prevents flooding the log with retries from queued requests
+* Version check cached — no longer reads package.json on every heartbeat (every 180s)
+* Welcome wizard: skip bridges whose room is missing instead of showing "room not found" error
+* Welcome wizard: fixed `playload` → `payload` typo breaking instance creation
+* Welcome wizard: spelling fixes (recomented → recommended, Num o → Num of, channelzToAdd → channelsToAdd)
+* Updated German locale keys to match corrected English strings
+* Consolidated all addon lifecycle scripts (install.sh, uninstall.sh, start.sh, preinstall.sh) into single rc.d script
+* rc.d script: install/uninstall_app/uninstall_config/start/stop/restart as named functions with dynamic dispatch
+* rc.d stop(): pgrep pattern changed to `node.*homekit-ccu` to avoid killing the installer process
+* rc.d run_server(): removed pipe to tee that prevented start-stop-daemon from fully detaching (caused WebUI overlay to hang)
+* update_script simplified: only copies rc.d script and tgz, delegates all logic to rc.d install
+* Unsupported platform now fails with error instead of silently exiting
 
 Changelog for 0.0.15:
 ====================

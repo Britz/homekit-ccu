@@ -7,26 +7,21 @@ echo "Building homekit-ccu addon v${VERSION}"
 
 mkdir -p tmp
 rm -rf tmp/*
-mkdir -p tmp/hap/etc
-mkdir -p tmp/www
 
 # Build the npm package and include it in the archive
 # The rc.d install function will install from this tgz (no public registry needed)
 cd ..
 npm pack
 TGZFILE=$(ls homekit-ccu-*.tgz | tail -1)
-mv "${TGZFILE}" addon_installer/tmp/hap/etc/homekit-ccu.tgz
+mv "${TGZFILE}" addon_installer/tmp/homekit-ccu.tgz
 cd addon_installer
 
 # copy all relevant stuff
 cp -a update_script tmp/
-cp -a rc.d tmp/
-# Generate VERSION file from package.json version
-echo "${VERSION}" > tmp/www/VERSION
-cp -a etc tmp/hap
+cp -a homekit-ccu tmp/
 
 # Patch the VER= line in the rc.d script with the actual version
-sed -i "s/^VER=.*/VER=${VERSION}/" tmp/rc.d/homekit-ccu
+sed -i "s/^VER=.*/VER=${VERSION}/" tmp/homekit-ccu
 
 TARFILE=homekit-ccu-${VERSION}.tar.gz
 if [ -e "$TTARFILE" ]; then

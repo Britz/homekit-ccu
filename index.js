@@ -110,7 +110,6 @@ try {
     log.info("Log into %s /homekit-ccu.log", logPath);
     log.setLogFile(path.join(logPath, 'homekit-ccu.log'))
   } else
-
     if (fs.existsSync('/var/log') && (fs.accessSync('/var/log', fs.constants.W_OK))) {
       log.info("Log into /var/log/homekit-ccu.log");
       log.setLogFile(path.join('/var/log', 'homekit-ccu.log'))
