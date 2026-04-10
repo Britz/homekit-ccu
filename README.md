@@ -30,6 +30,11 @@ Requires Node.js >= 20. OpenCCU and RaspberryMatic ship Node.js as part of the s
 - npm package is now bundled inside the addon tar — no internet access required on the CCU at install time
 - Node.js version is shown alongside the addon version in CCU System Control
 - OpenCCU compatibility improvements
+- Rega communication refactored with request queuing and automatic retry
+- Improved error handling across all CCU/RPC layers — fewer silent failures and crashes
+- Removed npm registry version check (no internet needed on CCU)
+- Safer addon installer scripts with proper service restart on update
+- Lighttpd proxy config reorganized with explicit SSL settings
 
 # Installation
 Download the latest addon (homekit-ccu-x.x.xx.tar.gz) from https://github.com/britz/homekit-ccu/releases/latest/ and install it via system preferences to your ccu.
@@ -169,5 +174,51 @@ Please open an issue [here](https://github.com/britz/homekit-ccu/issues/new) for
 # Documentation
 Please find the documentation in the [wiki](https://github.com/britz/homekit-ccu/wiki)
 
+## Useful commands for debugging
+
+```shell
+
+# re-deploy lighttpd conf
+cp /usr/local/addons/homekit-ccu/node_modules/homekit-ccu/etc/homekit-ccu.conf /usr/local/etc/config/lighttpd/homekit-ccu.conf 
+# /etc/config -> ../usr/local/etc/config
+
+# validate lighttpd config (catches syntax errors before restart)
+lighttpd -t -f /etc/lighttpd/lighttpd.conf
+
+# kill and restart lighttpd proxy
+killall lighttpd; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
+
+# print current lighttpd config
+lighttpd -p -f /etc/lighttpd/lighttpd.conf 2>&1
+
+# handle homekit-ccu daemon 
+/usr/local/etc/config/rc.d/homekit-ccu restart
+/usr/local/etc/config/rc.d/homekit-ccu stop 
+/usr/local/etc/config/rc.d/homekit-ccu start
+
+# serve 
+node /workspace/index.js -D 
+
+# kill and restart homekit-ccu server
+pkill -f 'node.*index.js' 2>/dev/null; sleep 1; node /workspace/index.js -D 
+
+# check if server is running 
+curl -v http://127.0.0.1:9874/ 2>&1 | head -20
+
+# Check if ports are open
+netstat -tlnp | grep 9874
+
+# check if ReGaHSS Remote Script API is available
+curl -X POST -d "dom.GetObject(\"HmIP-RF\");" http://127.0.0.1:8181/rega.exe
+# With login
+curl -X POST -u "Admin:IhrPasswort" -d "dom.GetObject(\"HmIP-RF\");" http://127.0.0.1:8181/rega.exe
+
+ls /usr/local/etc/config/addons/homekit-ccu/
+
+tail -f /var/log/hkccu-server.log 
+```
+
 # Icon
 the icon was made by @roe1974
+
+

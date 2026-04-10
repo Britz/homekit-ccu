@@ -6,6 +6,14 @@ Changelog for 0.0.15:
 * Version is now derived from package.json as the single source of truth (addon_installer/VERSION removed)
 * Node.js version is now shown alongside the addon version in CCU System Control
 * Fixed OpenCCU compatibility issues
+* Rega communication: added request queue (serializes concurrent requests to single-threaded Rega) and automatic retry with exponential backoff
+* Improved error handling: added unhandledRejection handler, .catch() on all Promise chains in CCU/RPC/config layers
+* Removed dead code: empty init() method, unused RPC NotFound handler, obsolete _index.js (2034 lines)
+* Removed npm registry version check — config UI no longer requires internet access
+* Fixed console() typo in configuration service
+* Addon installer: safer process killing (xargs -r, error suppression), proper service stop/reinstall on update
+* Build script: pre-build cleanup removes stale tarballs
+* Lighttpd proxy config: reorganized with section comments and explicit ssl.engine per socket
 
 Changelog for 0.0.64:
 ====================
