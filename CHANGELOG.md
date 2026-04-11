@@ -5,12 +5,19 @@ Changelog for 0.0.16:
 * Added .catch() to all Rega Promise chains (fetchAllDevices, fetchRooms, hazDatapoint, setValue, setVariable, getVariableValue, runProgram, auth checks) — Rega errors no longer crash the server
 * Rega requests are now serialised via a module-level queue — prevents socket hang-ups when Apple Home or the wizard triggers concurrent Rega calls
 * Rega script() now retries up to 3 times with 5s delay on transient failures; ping uses 0 retries with 5s timeout
+* Rega retry counter fixed — was stuck at "attempt 1/3" due to recursive setTimeout; replaced with async for loop
+* Rega HTTP requests now use `Connection: close` and `agent: false` — fixes persistent socket hang-ups caused by Node.js HTTP keep-alive connection reuse against single-threaded ReGaHss
+* Rega Content-Length now uses `Buffer.byteLength()` for correct byte count with multi-byte characters
+* Rega queue adds 150ms pause between consecutive requests to avoid overloading ReGaHss
+* Rega constructor accepts a `tag` parameter for per-caller log context (e.g. `[Rega] [getValue]`, `[Rega] [fetchRooms]`)
+* Switched mDNS advertiser from ciao to bonjour-hap — fixes HomeKit device discovery failing on OpenCCU
 * pingRega uses a short 5s timeout; unexpected Rega responses are now logged verbatim
 * getValue() now fires events on cache hits — fixes registerAddressForEventProcessingAtAccessory needing ignoreCache=true workaround
 * Fixed compatibleObjects IPC handler not calling sendObjects() — UI now updates when device list is loaded
 * Removed npm registry version check — was always failing (package not public) and logging noise on every UI load
 * Fixed console() typo (should be console.log) in configurationsrv shutdown handler
 * Removed empty NotFound RPC handler, unused getValue()/callback param in setVariable, empty init() method
+* HomeKit Instances UI: 3 overlapping action buttons merged into a responsive btn-group with CoreUI icons; text labels hidden on small screens
 * Rega queue now rejects all pending requests when Rega is down — prevents flooding the log with retries from queued requests
 * Version check cached — no longer reads package.json on every heartbeat (every 180s)
 * Welcome wizard: skip bridges whose room is missing instead of showing "room not found" error
@@ -19,9 +26,14 @@ Changelog for 0.0.16:
 * Updated German locale keys to match corrected English strings
 * Consolidated all addon lifecycle scripts (install.sh, uninstall.sh, start.sh, preinstall.sh) into single rc.d script
 * rc.d script: install/uninstall_app/uninstall_config/start/stop/restart as named functions with dynamic dispatch
+* rc.d log(): date format matches server output `[M/D/YYYY, H:MM:SS AM/PM]`; fixed `${@:2}` bashism for BusyBox ash compatibility
+* rc.d background_install(): uses flock-based locking to prevent parallel installs; runs in background so CCU WebUI returns immediately
+* rc.d status(): reports install and server state via flock lock check and PID file
+* rc.d info(): dynamically shows install progress, hides config button and action buttons during install, shows "Server stopped" when not running
+* rc.d install(): npm install failure now detected and logged instead of silently continuing with empty module directory
 * rc.d stop(): pgrep pattern changed to `node.*homekit-ccu` to avoid killing the installer process
 * rc.d run_server(): removed pipe to tee that prevented start-stop-daemon from fully detaching (caused WebUI overlay to hang)
-* update_script simplified: only copies rc.d script and tgz, delegates all logic to rc.d install
+* update_script: install runs in background so CCU WebUI popup returns immediately instead of timing out
 * Unsupported platform now fails with error instead of silently exiting
 
 Changelog for 0.0.15:

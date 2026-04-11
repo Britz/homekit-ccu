@@ -79,7 +79,7 @@ cp -f "${WORKSPACE}/addon_installer/etc/www/homekit-ccu-logo.png" "${ADDONWWW_DI
 chmod +x "${ADDONWWW_DIR}/update-check.cgi"
 # Install lighttpd proxy config (proxies external ports to config server)
 mkdir -p /etc/config/lighttpd
-cp -f "${WORKSPACE}/etc/homekit-ccu.conf" "/etc/config/lighttpd/${ADDONNAME}.conf"
+cp -f "${WORKSPACE}/etc/homekit_ccu.conf" "/etc/config/lighttpd/${ADDONNAME}.conf"
 # Open proxy ports in firewall via TCL library (persists through WebUI saves)
 if [ -f /lib/libfirewall.tcl ]; then
   tclsh - <<'FWEOF'
@@ -109,10 +109,10 @@ echo "  ${RCD_DIR}/${ADDONNAME}"
 
 # ---- 6. Register addon button in CCU WebUI ----
 echo "[6/6] Registering addon in CCU WebUI..."
-# Ensure the hm_addons.cfg exists
-touch /etc/config/hm_addons.cfg
-node "${WORKSPACE}/etc/hm_addon.js" hap "${WORKSPACE}/etc/hap_addon.cfg"
-echo "  Registered 'hap' in /etc/config/hm_addons.cfg"
+# Ensure the hm_addons.cfg.cfg exists
+touch /etc/config/hm_addons.cfg.cfg
+node "${WORKSPACE}/etc/hm_addon.js" homekit-ccu "${WORKSPACE}/etc/hm_addons.cfg.cfg"
+echo "  Registered 'homekit-ccu' in /etc/config/hm_addons.cfg.cfg"
 
 echo ""
 echo "=== Installation complete ==="

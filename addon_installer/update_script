@@ -28,12 +28,9 @@ if [ "$1" == "HM-RASPBERRYMATIC" ] || [ "$1" == "CCU3" ] ; then
   chmod 755 ${RCD_DIR}
   chmod +x ${RCD_DIR}/${ADDONNAME}
 
-  # install npm package, lighttpd config, WebUI button
-  # (handles stopping and removing old package if present)
-  ${RCD_DIR}/${ADDONNAME} install
-
-  # start the service
-  ${RCD_DIR}/${ADDONNAME} start
+  # Run install + start in background so the CCU WebUI popup returns immediately.
+  # The heavy npm install can take a while — if update_script blocks, the UI times out.
+  ${RCD_DIR}/${ADDONNAME} background_install  &
   exit 0
 else
   echo "ERROR: unsupported platform '$1'" >&2

@@ -1,8 +1,7 @@
 #!/bin/sh
 ADDON_NAME=homekit-ccu
 ADDON_DIR=/usr/local/addons/${ADDON_NAME}
-HAPDIR=${ADDON_DIR}/node_modules/${ADDON_NAME}
-HAPROOT=${ADDON_DIR}/
+MODULE_DIR=${ADDON_DIR}/node_modules/${ADDON_NAME}
 CONFIG_URL=/addons/${ADDON_NAME}/index.html
 CONFIG_DIR=/usr/local/etc/config
 ADDONCFG_DIR=${CONFIG_DIR}/addons/${ADDON_NAME}
@@ -73,7 +72,7 @@ check_node_version() {
 install() {
   check_node_version || return 1
 
-  if [ -f ${HAPDIR}/index.js ]; then
+  if [ -f ${MODULE_DIR}/index.js ]; then
     log "install" "Existing installation found, removing package first..."
     uninstall_server
   fi
@@ -90,20 +89,20 @@ install() {
   
   mkdir -p ${NPMCACHE_DIR}
   log "install" "Installing Node.JS packages from \"${ADDONCFG_DIR}/etc/homekit-ccu.tgz\"." 
-  npm i --cache ${NPMCACHE_DIR} --progress=false --prefer-offline --no-audit ${ADDONCFG_DIR}/etc/homekit-ccu.tgz >> ${LOGFILE} 2>&1
+  npm i --cache ${NPMCACHE_DIR} ${ADDONCFG_DIR}/etc/homekit-ccu.tgz >> ${LOGFILE} 2>&1
   rm -rf ${NPMCACHE_DIR}
 
   log "install" "Installing WebUI files."
   mkdir -p ${ADDONWWW_DIR}/${ADDONNAME}
-  cp -af ${HAPDIR}/lib/configurationsrv/html/* ${ADDONWWW_DIR}
+  cp -af ${MODULE_DIR}/lib/configurationsrv/html/* ${ADDONWWW_DIR}
 
   log "install" "Installing lighttpd config."
   mkdir -p /etc/config/lighttpd
-  cp -af ${HAPDIR}/etc/homekit-ccu.conf /etc/config/lighttpd/${ADDON_NAME}.conf
+  cp -af ${MODULE_DIR}/etc/homekit_ccu.conf /etc/config/lighttpd/${ADDON_NAME}.conf
   killall lighttpd 2>/dev/null; sleep 1; lighttpd -f /etc/lighttpd/lighttpd.conf
 
   log "install" "Creating HomeKit Button."
-  node ${HAPDIR}/etc/hm_addon.js hap ${HAPDIR}/etc/hap_addon.cfg >> ${LOGFILE} 2>&1
+  node "${MODULE_DIR}/etc/hm_addon.js" homekit-ccu ${MODULE_DIR}/etc/homekit_ccu_addon.cfg >> ${LOGFILE} 2>&1
 
   log "install" "Adding .nobackup to addon dir."
   touch ${ADDON_DIR}/.nobackup
@@ -125,6 +124,24 @@ EOF
   fi
 
   log "install" "Installation complete."
+}
+
+background_install() {
+  LOCKFILE=/var/run/homekit-ccu-install.lock
+  exec 9>"$LOCKFILE"
+  if ! flock -n 9; then
+    log "install" "ERROR: Installation already running, aborting."
+    return 1
+  fi
+  # Remove button during install so the CCU WebUI doesn't show a broken link
+  if [ -f ${MODULE_DIR}/etc/hm_addon.js ]; then
+    node "${MODULE_DIR}/etc/hm_addon.js" homekit-ccu >> ${LOGFILE} 2>&1
+  fi
+  log "install" "Running install and start in background"
+  (
+    install && start
+    flock -u 9 >>${LOGFILE} 2>&1
+  ) &>/dev/null &
 }
 
 # ------------------------------------------------------------------
@@ -173,9 +190,9 @@ EOF
 uninstall_server() {
   stop
    # remove WebUI button
-  if [ -f ${HAPDIR}/etc/hm_addon.js ]; then
+  if [ -f ${MODULE_DIR}/etc/hm_addon.js ]; then
     log "uninstall" "Removing WebUI button."
-    node ${HAPDIR}/etc/hm_addon.js hap >> ${LOGFILE} 2>&1
+    node "${MODULE_DIR}/etc/hm_addon.js" homekit-ccu >> ${LOGFILE} 2>&1
   fi
 
   # remove addon directory
@@ -211,9 +228,15 @@ uninstall() {
 # Daemon functions required by CCU
 # ------------------------------------------------------------------
 
+start_debug() {
+	log "start" "Starting HomeKit-CCU."
+	start-stop-daemon --start --quiet --oknodo --make-pidfile --background --pidfile $PIDFILE --startas "node" -- "$MODULE_DIR/index.js" "-D"
+	log "start" "HomeKit-CCU started, log may be found at /tmp/homekit-ccu.log."
+}
+
 start() {
 	log "start" "Starting HomeKit-CCU."
-	start-stop-daemon --start --quiet --oknodo --make-pidfile --background --pidfile $PIDFILE --startas "node" -- "$HAPDIR/index.js"
+	start-stop-daemon --start --quiet --oknodo --make-pidfile --background --pidfile $PIDFILE --startas "node" -- "$MODULE_DIR/index.js"
 	log "start" "HomeKit-CCU started, log may be found at /tmp/homekit-ccu.log."
 }
 
@@ -237,12 +260,44 @@ restart() {
 	start
 }
 
+status() {
+	LOCKFILE=/var/run/homekit-ccu-install.lock
+	if ! flock -n 9 9>"$LOCKFILE" 2>/dev/null; then
+		echo "install: running"
+	elif [ -f ${MODULE_DIR}/index.js ]; then
+		echo "install: complete"
+	else
+		echo "install: not installed"
+	fi
+	if [ -f $PIDFILE ] && kill -0 "$(cat $PIDFILE)" 2>/dev/null; then
+		echo "server: running (PID $(cat $PIDFILE))"
+	else
+		echo "server: stopped"
+	fi
+}
+
 info() {
-	echo "Info: <center><b>HomeKit-CCU</b><p style='margin-top: 5px;margin-bottom: 5px;'><img src='../addons/homekit-ccu/homekit-ccu-logo.png'></p></center>HomeMatic/HomeMatic IP goes Apple Homekit<br /><a href='https://github.com/britz/homekit-ccu/'>https://github.com/britz/homekit-ccu/</a>"
+	LOCKFILE=/var/run/homekit-ccu-install.lock
+	INFO_HTML="<center><b>HomeKit-CCU</b><p style='margin-top: 5px;margin-bottom: 5px;'><img src='../addons/homekit-ccu/homekit-ccu-logo.png'></p></center>"
+
+	if ! flock -n 9 9>"$LOCKFILE" 2>/dev/null; then
+		INFO_HTML="${INFO_HTML}<br /><b style='color:orange;'>Installation in progress...</b>"
+		OPS=""
+	elif [ -f $PIDFILE ] && kill -0 "$(cat $PIDFILE)" 2>/dev/null; then
+		INFO_HTML="${INFO_HTML}HomeMatic/HomeMatic IP goes Apple Homekit"
+		OPS="uninstall stop restart"
+	else
+		INFO_HTML="${INFO_HTML}<b style='color:red;'>Server stopped</b>"
+		OPS="uninstall start"
+	fi
+
+	INFO_HTML="${INFO_HTML}<br /><a href='https://github.com/britz/homekit-ccu/'>https://github.com/britz/homekit-ccu/</a>"
+
+	echo "Info: ${INFO_HTML}"
 	echo "Name: HomeKit-CCU"
 	echo "Version: $VER (Node $NODE_VER)"
-	echo "Operations: uninstall restart"
-	echo "Config-Url: $CONFIG_URL"
+	echo "Operations: ${OPS}"
+	[ -n "${OPS}" ] && echo "Config-Url: $CONFIG_URL"
 	echo "Update: /addons/${ADDON_NAME}/update-check.cgi"
 }
 

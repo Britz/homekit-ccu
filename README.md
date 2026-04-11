@@ -24,6 +24,20 @@ All this runs on your RaspberryMatic / OpenCCU / CCU3. You will not need any ext
 
 Requires Node.js >= 20. OpenCCU and RaspberryMatic ship Node.js as part of the system image. If Node.js is missing or too old, the addon will automatically download and install a compatible version during installation.
 
+# What's new in 0.0.16
+
+- Fixed HomeKit device discovery on OpenCCU (switched mDNS advertiser from ciao to bonjour-hap)
+- Fixed Rega communication: socket hang-ups resolved by disabling HTTP keep-alive connection reuse
+- Rega retry logic fixed — counter was stuck at "1/3"; now correctly retries and gives up after 3 attempts
+- Rega requests serialised with 150ms cooldown between calls to avoid overloading single-threaded ReGaHss
+- Per-caller Rega log tags for easier debugging (e.g. `[Rega] [getValue]`, `[Rega] [fetchRooms]`)
+- HomeKit Instances UI: action buttons now responsive — icons only on small screens, full labels on medium+
+- Addon installer runs in background — CCU WebUI no longer times out during install
+- flock-based install locking prevents parallel installs
+- Dynamic status in CCU System Control: shows install progress, hides buttons during install
+- npm install failures are now detected and logged instead of silently continuing
+- Log date format aligned between rc.d script and Node.js server
+
 # What's new in 0.0.15
 
 - Renamed from **hap-homematic** to **homekit-ccu**
@@ -179,7 +193,7 @@ Please find the documentation in the [wiki](https://github.com/britz/homekit-ccu
 ```shell
 
 # re-deploy lighttpd conf
-cp /usr/local/addons/homekit-ccu/node_modules/homekit-ccu/etc/homekit-ccu.conf /usr/local/etc/config/lighttpd/homekit-ccu.conf 
+cp /usr/local/addons/homekit-ccu/node_modules/homekit-ccu/etc/homekit_ccu.conf /usr/local/etc/config/lighttpd/homekit_ccu.conf 
 # /etc/config -> ../usr/local/etc/config
 
 # validate lighttpd config (catches syntax errors before restart)
@@ -197,10 +211,10 @@ lighttpd -p -f /etc/lighttpd/lighttpd.conf 2>&1
 /usr/local/etc/config/rc.d/homekit-ccu start
 
 # serve 
-node /workspace/index.js -D 
+node /usr/local/addons/homekit-ccu/node_modules/homekit-ccu/index.js -D 
 
 # kill and restart homekit-ccu server
-pkill -f 'node.*index.js' 2>/dev/null; sleep 1; node /workspace/index.js -D 
+pkill -f 'node.*index.js' 2>/dev/null; sleep 1; node /usr/local/addons/homekit-ccu/node_modules/homekit-ccu/index.js -D 
 
 # check if server is running 
 curl -v http://127.0.0.1:9874/ 2>&1 | head -20
@@ -215,7 +229,7 @@ curl -X POST -u "Admin:IhrPasswort" -d "dom.GetObject(\"HmIP-RF\");" http://127.
 
 ls /usr/local/etc/config/addons/homekit-ccu/
 
-tail -f /var/log/hkccu-server.log 
+tail -f /var/log/homekit-ccu.log 
 ```
 
 # Icon
